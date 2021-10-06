@@ -1,0 +1,10 @@
+/dist
+/node_modules
+
+keys/*
+
+.env
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode
