@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { State } from '../enums/state.enum';
 import { Sitting } from './sitting.entity';
 
 @Entity('ticket')
@@ -15,9 +16,12 @@ export class Ticket {
   @Column()
   departureDateTime: Date;
 
-  // TODO: change field type to enum
-  @Column()
-  state: string;
+  @Column({
+    type: 'enum',
+    enum: State,
+    default: State.Empty,
+  })
+  state: State[];
 
   @Column()
   transactionDateTime: Date;
