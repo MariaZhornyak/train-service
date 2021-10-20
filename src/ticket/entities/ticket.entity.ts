@@ -4,12 +4,14 @@ import {
   ManyToOne,
   PrimaryColumn,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { State } from '../enums/state.enum';
 import { Sitting } from '../../carriage/entities/sitting.entity';
 
 @Entity('ticket')
+@Index(['sitting', 'departureDateTime'])
 export class Ticket {
   @PrimaryColumn({ type: 'uuid' })
   id: string = uuid();
@@ -29,7 +31,7 @@ export class Ticket {
   @Column({
     type: 'enum',
     enum: State,
-    default: State.Empty,
+    default: State.Booked,
   })
   state: State;
 

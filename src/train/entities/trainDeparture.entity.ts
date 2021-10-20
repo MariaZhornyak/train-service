@@ -5,7 +5,7 @@ import { Day } from '../enum/day.enum';
 import { Direction } from '../enum/direction.enum';
 import { Train } from './train.entity';
 
-@Entity('trainDeparture')
+@Entity('train_departure')
 export class TrainDeparture {
   @PrimaryColumn({ type: 'uuid' })
   id: string = uuid();

@@ -12,7 +12,7 @@ import { TrainStation } from './entities/trainStation.entity';
 import { CreateStationDto } from './dto/createStation.dto';
 import { UpdateStationDto } from './dto/updateStation.dto';
 import { Station } from './entities/station.entity';
-import { TrainDeparture } from '../train/entities/trainDeparture.entity';
+import { ISuccess } from '../interface/success.interface';
 
 @Injectable()
 export class StationService {
@@ -22,8 +22,6 @@ export class StationService {
     private routeStationRepository: Repository<RouteStation>,
     @InjectRepository(TrainStation)
     private trainStationRepository: Repository<TrainStation>,
-    @InjectRepository(Train)
-    private trainRepository: Repository<Train>,
   ) {}
 
   async deleteStation(id: string): Promise<Station> {
@@ -83,7 +81,7 @@ export class StationService {
   async updateStation(
     id: string,
     updateStationDto: UpdateStationDto,
-  ): Promise<Station> {
+  ): Promise<ISuccess> {
     const station = await this.stationRepository.findOne(id);
 
     if (!station) {
@@ -93,9 +91,11 @@ export class StationService {
       });
     }
 
-    station.name = updateStationDto.name;
-
-    return await this.stationRepository.save(station);
+    await this.stationRepository.update(
+      { id },
+      { name: updateStationDto.name },
+    );
+    return { success: true };
   }
 
   async getRoutesOfStation(stationId: string): Promise<Route[]> {
@@ -142,7 +142,7 @@ export class StationService {
     return trainStations.map((rs) => rs.train);
   }
 
-  async scheduleOfTrainsAtStation(stationId: string): Promise<number> {
+  async scheduleOfTrainsAtStation(stationId: string) {
     const station = await this.stationRepository.findOne({
       id: stationId,
     });
@@ -154,45 +154,20 @@ export class StationService {
       });
     }
 
-    const trainStations = await this.trainStationRepository.find({
-      relations: ['train'],
-      where: {
-        station,
-      },
-    });
-
-    const trains = trainStations.map((rs) => rs.train);
-
-    const trainDepartureTime = trains.map((tr) => tr.trainDepartures);
-
-    for (let i = 0; i < trainDepartureTime.length; i++) {
-      return (
-        trainDepartureTime[i][i].time + trainStations[i].wayFromFirstStation
-      );
-    }
-
-    // const kjkhh = trainDepartureTime.map((td) =>
-    //   td.map((trainTime) => trainTime.time),
-    // );
-
-    // const trainsWayFromFirstStation = trains.map((tr) =>
-    //   tr.trainStations.map((ts) => ts.wayFromFirstStation),
-    // );
-
-    // for (let i = 0; i < trainDepartureTime.length; i++) {
-    //   trainDepartureTime[i][i] + trainsWayFromFirstStation[i][i];
-    // }
-
-    // const trainsWayFromLastStation = trains.map((tr) =>
-    //   tr.trainStations.map((ts) => ts.wayFromLastStation),
-    // );
-
-    // return { trainsWayFromFirstStation, trainsWayFromLastStation };
+    const schedule = await this.stationRepository.query(`
+      SELECT train.id, route.name, train_departure.direction,
+        CASE WHEN train_departure.direction = 'fromStart'
+          THEN train_departure.time + train_station."wayFromFirstStation"
+          ELSE train_departure.time + train_station."wayFromLastStation"
+          END
+          as departure_time_at_station
+      FROM station
+      INNER JOIN train_station ON station.id = train_station."stationId"
+      INNER JOIN train ON train.id = train_station."trainId"
+      INNER JOIN train_departure ON train.id = train_departure."trainId"
+      INNER JOIN route ON route.id = train."routeId"
+      WHERE station.id = '${stationId}'
+    `);
+    return schedule;
   }
 }
-
-// const trainsWayFromLastStation = trains.map((tr) =>
-//   tr.trainStations.map(
-//     (ts) => ts.wayFromLastStation + ts.departureDateTime.valueOf(),
-//   ),
-// );

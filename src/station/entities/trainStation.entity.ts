@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { Station } from './station.entity';
 import { Train } from '../../train/entities/train.entity';
 
-@Entity('trainStation')
+@Entity('train_station')
 export class TrainStation {
   @PrimaryColumn({ type: 'uuid' })
   id: string = uuid();

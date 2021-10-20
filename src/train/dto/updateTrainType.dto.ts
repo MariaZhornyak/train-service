@@ -1,9 +1,9 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UpdateTrainTypeDto {
-  @IsNotEmpty()
-  id: string;
+  @IsOptional()
+  id?: string;
 
-  @IsNotEmpty()
-  name: string;
+  @IsOptional()
+  name?: string;
 }

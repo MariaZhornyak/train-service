@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { ISuccess } from '../interface/success.interface';
 import { Route } from '../route/entities/route.entity';
 import { Train } from '../train/entities/train.entity';
 import { CreateStationDto } from './dto/createStation.dto';
@@ -35,7 +36,7 @@ export class StationController {
   updateStation(
     @Param('id') id: string,
     @Body() updateStationDto: UpdateStationDto,
-  ): Promise<Station> {
+  ): Promise<ISuccess> {
     return this.stationService.updateStation(id, updateStationDto);
   }
 
@@ -55,7 +56,7 @@ export class StationController {
   }
 
   @Get('/schedule/:id/trains')
-  scheduleOfTrainsAtStations(@Param('id') stationId: string): Promise<number> {
+  scheduleOfTrainsAtStations(@Param('id') stationId: string) {
     return this.stationService.scheduleOfTrainsAtStation(stationId);
   }
 }

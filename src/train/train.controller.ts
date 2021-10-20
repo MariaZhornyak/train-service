@@ -20,6 +20,7 @@ import { TrainStation } from '../station/entities/trainStation.entity';
 import { TrainService } from './train.service';
 import { CreateTrainDepartureDto } from './dto/createTrainDeparture.dto';
 import { TrainDeparture } from './entities/trainDeparture.entity';
+import { ISuccess } from '../interface/success.interface';
 
 @Controller('trains')
 export class TrainController {
@@ -42,7 +43,7 @@ export class TrainController {
   updateTrain(
     @Param('id') id: string,
     @Body() updateTrainDto: UpdateTrainDto,
-  ): Promise<Train> {
+  ): Promise<ISuccess> {
     return this.trainService.updateTrain(id, updateTrainDto);
   }
 
@@ -70,7 +71,7 @@ export class TrainController {
   updateTrainType(
     @Param('name') name: string,
     @Body() updateTrainTypeDto: UpdateTrainTypeDto,
-  ): Promise<TrainType> {
+  ): Promise<ISuccess> {
     return this.trainService.updateTrainType(name, updateTrainTypeDto);
   }
 
@@ -105,7 +106,7 @@ export class TrainController {
   updateTrainStation(
     @Param('id') id: string,
     @Body() updateTrainStationDto: UpdateTrainStationDto,
-  ): Promise<TrainStation> {
+  ): Promise<ISuccess> {
     return this.trainService.updateTrainStation(id, updateTrainStationDto);
   }
 
@@ -114,5 +115,10 @@ export class TrainController {
     @Body() createTrainDepartureDto: CreateTrainDepartureDto,
   ): Promise<TrainDeparture> {
     return this.trainService.createTrainDeparture(createTrainDepartureDto);
+  }
+
+  @Get('get/schedule/:id')
+  getScheduleOfTrainsById(@Param() trainId: string) {
+    return this.trainService.getScheduleOfTrainsById(trainId);
   }
 }

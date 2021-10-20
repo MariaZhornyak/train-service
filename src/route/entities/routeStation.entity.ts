@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { Route } from './route.entity';
 import { Station } from '../../station/entities/station.entity';
 
-@Entity('routeStation')
+@Entity('route_station')
 @Index(['route', 'station'])
 export class RouteStation {
   @PrimaryColumn({ type: 'uuid' })

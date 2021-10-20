@@ -1,7 +1,7 @@
 import { Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Train } from './train.entity';
 
-@Entity('trainType')
+@Entity('train_type')
 export class TrainType {
   @PrimaryColumn()
   name: string;

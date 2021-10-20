@@ -5,9 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ISuccess } from '../interface/success.interface';
 import { CreateTicketDto } from './dto/createTicket.dto';
 import { UpdateTicketDto } from './dto/updateTicket.dto';
 import { Ticket } from './entities/ticket.entity';
+import { State } from './enums/state.enum';
 
 @Injectable()
 export class TicketService {
@@ -50,7 +52,10 @@ export class TicketService {
     return await this.ticketRepository.remove(ticket);
   }
 
-  async createTicket(createTicketDto: CreateTicketDto): Promise<Ticket> {
+  async createTicket(
+    createTicketDto: CreateTicketDto,
+    state: State,
+  ): Promise<Ticket> {
     const ticket = await this.ticketRepository.findOne({
       departureDateTime: createTicketDto.departureDateTime,
       sitting: createTicketDto.sitting,
@@ -66,8 +71,7 @@ export class TicketService {
     const newTicket = new Ticket();
 
     newTicket.sitting = createTicketDto.sitting;
-    newTicket.state = createTicketDto.state;
-    newTicket.transactionDateTime = createTicketDto.transactionDateTime;
+    newTicket.state = state;
     newTicket.departureDateTime = createTicketDto.departureDateTime;
     // newTicket.userId = createTicketDto.userId;
 
@@ -77,7 +81,7 @@ export class TicketService {
   async updateTicket(
     id: string,
     updateTicketDto: UpdateTicketDto,
-  ): Promise<Ticket> {
+  ): Promise<ISuccess> {
     const ticket = await this.ticketRepository.findOne(id);
 
     if (!ticket) {
@@ -87,12 +91,15 @@ export class TicketService {
       });
     }
 
-    ticket.sitting = updateTicketDto.sitting;
-    ticket.state = updateTicketDto.state;
-    ticket.transactionDateTime = updateTicketDto.transactionDateTime;
-    ticket.departureDateTime = updateTicketDto.departureDateTime;
-    // ticket.userId = updateTicketDto.userId;
+    const newObj = {};
 
-    return await this.ticketRepository.save(ticket);
+    for (const key in updateTicketDto) {
+      if (updateTicketDto[key] != undefined) {
+        newObj[key] = updateTicketDto[key];
+      }
+    }
+
+    await this.ticketRepository.update({ id }, newObj);
+    return { success: true };
   }
 }

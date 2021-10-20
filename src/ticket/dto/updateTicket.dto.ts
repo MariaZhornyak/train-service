@@ -15,7 +15,4 @@ export class UpdateTicketDto {
   @IsOptional()
   @IsEnum(State)
   state?: State;
-
-  @IsOptional()
-  transactionDateTime?: Date;
 }

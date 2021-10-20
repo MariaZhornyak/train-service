@@ -1,6 +1,6 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UpdateStationDto {
-  @IsNotEmpty()
-  name: string;
+  @IsOptional()
+  name?: string;
 }

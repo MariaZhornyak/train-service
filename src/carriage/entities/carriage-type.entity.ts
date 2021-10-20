@@ -1,7 +1,7 @@
 import { Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Carriage } from './carriage.entity';
 
-@Entity('carriageType')
+@Entity('carriage_type')
 export class CarriageType {
   @PrimaryColumn()
   name: string;

@@ -16,6 +16,7 @@ import { Train } from './entities/train.entity';
 import { TrainStation } from '../station/entities/trainStation.entity';
 import { TrainDeparture } from './entities/trainDeparture.entity';
 import { CreateTrainDepartureDto } from './dto/createTrainDeparture.dto';
+import { ISuccess } from '../interface/success.interface';
 
 @Injectable()
 export class TrainService {
@@ -84,10 +85,7 @@ export class TrainService {
     return await this.trainRepository.save(newTrain);
   }
 
-  async updateTrain(
-    id: string,
-    updateTrainDto: UpdateTrainDto,
-  ): Promise<Train> {
+  async updateTrain(id: string, updateTrainDto: UpdateTrainDto) {
     const train = await this.trainRepository.findOne(id);
 
     if (!train) {
@@ -97,10 +95,16 @@ export class TrainService {
       });
     }
 
-    train.type = updateTrainDto.type;
-    train.route = updateTrainDto.route;
+    const newObj = {};
 
-    return await this.trainRepository.save(train);
+    for (const key in updateTrainDto) {
+      if (updateTrainDto[key] != undefined) {
+        newObj[key] = updateTrainDto[key];
+      }
+    }
+
+    await this.trainRepository.update({ id }, newObj);
+    return { success: true };
   }
 
   async getTrainTypesList(): Promise<TrainType[]> {
@@ -162,7 +166,7 @@ export class TrainService {
   async updateTrainType(
     name: string,
     updateTrainTypeDto: UpdateTrainTypeDto,
-  ): Promise<TrainType> {
+  ): Promise<ISuccess> {
     const trainType = await this.trainTypeRepository.findOne(name);
 
     if (!trainType) {
@@ -172,9 +176,11 @@ export class TrainService {
       });
     }
 
-    trainType.name = updateTrainTypeDto.name;
-
-    return await this.trainTypeRepository.save(trainType);
+    await this.trainTypeRepository.update(
+      { name },
+      { name: updateTrainTypeDto.name },
+    );
+    return { success: true };
   }
 
   async createTrainStation(
@@ -245,7 +251,7 @@ export class TrainService {
   async updateTrainStation(
     id: string,
     updateTrainStationDto: UpdateTrainStationDto,
-  ): Promise<TrainStation> {
+  ): Promise<ISuccess> {
     const trainStation = await this.trainStationRepository.findOne(id);
 
     if (!trainStation) {
@@ -255,17 +261,16 @@ export class TrainService {
       });
     }
 
-    trainStation.train = updateTrainStationDto.train;
-    trainStation.station = updateTrainStationDto.station;
-    trainStation.trainStandFromFirstStation =
-      updateTrainStationDto.trainStandFromFirstStation;
-    trainStation.trainStandFromLastStation =
-      updateTrainStationDto.trainStandFromLastStation;
-    trainStation.wayFromFirstStation =
-      updateTrainStationDto.wayFromFirstStation;
-    trainStation.wayFromLastStation = updateTrainStationDto.wayFromLastStation;
+    const newObj = {};
 
-    return await this.trainStationRepository.save(trainStation);
+    for (const key in updateTrainStationDto) {
+      if (updateTrainStationDto[key] != undefined) {
+        newObj[key] = updateTrainStationDto[key];
+      }
+    }
+
+    await this.trainStationRepository.update({ id }, newObj);
+    return { success: true };
   }
 
   async createTrainDeparture(
@@ -274,6 +279,8 @@ export class TrainService {
     const trainDeparture = await this.trainDepartureRepository.findOne(
       {
         train: createTrainDepartureDto.train,
+        day: createTrainDepartureDto.day,
+        time: createTrainDepartureDto.time,
       },
       { relations: ['train'] },
     );
@@ -292,6 +299,27 @@ export class TrainService {
     newTrainDeparture.direction = createTrainDepartureDto.direction;
     newTrainDeparture.day = createTrainDepartureDto.day;
 
-    return await this.trainStationRepository.save(newTrainDeparture);
+    return await this.trainDepartureRepository.save(newTrainDeparture);
+  }
+
+  async getScheduleOfTrainsById(trainId: string) {
+    const train = await this.trainRepository.findOne(trainId);
+
+    if (!train) {
+      throw new NotFoundException({
+        success: false,
+        message: `Train #${trainId} not found`,
+      });
+    }
+
+    const schedule = await this.trainRepository.query(`
+    SELECT train.id, route.name, train_departure.day, train_departure.time 
+    FROM train 
+    INNER JOIN train_departure ON train.id = train_departure."trainId"
+    INNER JOIN train_station ON train.id = train_station."trainId"
+    INNER JOIN route ON train."routeId" = route.id
+      WHERE route.id = '${trainId}'
+    `);
+    return schedule;
   }
 }

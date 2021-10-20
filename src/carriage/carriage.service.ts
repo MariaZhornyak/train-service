@@ -4,10 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+import { ISuccess } from '../interface/success.interface';
 import { Ticket } from '../ticket/entities/ticket.entity';
 import { CreateCarriageDto } from './dto/createCarriage.dto';
 import { CreateCarriageTypeDto } from './dto/createCarriageType.dto';
+import { FreeSittingsDto } from './dto/freeSittings.dto';
 import { UpdateCarriageDto } from './dto/updateCarriage.dto';
 import { UpdateCarriageTypeDto } from './dto/updateCarriageType.dto';
 import { CarriageType } from './entities/carriage-type.entity';
@@ -22,7 +24,7 @@ export class CarriageService {
     @InjectRepository(CarriageType)
     private carriageTypeRepository: Repository<CarriageType>,
     @InjectRepository(Sitting)
-    private sittingRepository: Repository<Sitting>, // @InjectRepository(Train) // private trainRepository: Repository<Train>,
+    private sittingRepository: Repository<Sitting>,
   ) {}
 
   async getCarriagesList(): Promise<Carriage[]> {
@@ -99,7 +101,7 @@ export class CarriageService {
   async updateCarriage(
     id: string,
     updateCarriageDto: UpdateCarriageDto,
-  ): Promise<Carriage> {
+  ): Promise<ISuccess> {
     const carriage = await this.carriageRepository.findOne(id);
 
     if (!carriage) {
@@ -109,11 +111,16 @@ export class CarriageService {
       });
     }
 
-    carriage.train = updateCarriageDto.train;
-    carriage.indexInTrain = updateCarriageDto.indexInTrain;
-    carriage.type = updateCarriageDto.type;
+    const newObj = {};
 
-    return await this.carriageRepository.save(carriage);
+    for (const key in updateCarriageDto) {
+      if (updateCarriageDto[key] != undefined) {
+        newObj[key] = updateCarriageDto[key];
+      }
+    }
+
+    await this.carriageRepository.update({ id }, newObj);
+    return { success: true };
   }
 
   async getCarriageTypesList(): Promise<CarriageType[]> {
@@ -175,7 +182,7 @@ export class CarriageService {
   async updateCarriageType(
     name: string,
     updateCarriageTypeDto: UpdateCarriageTypeDto,
-  ): Promise<CarriageType> {
+  ): Promise<ISuccess> {
     const carriageType = await this.carriageTypeRepository.findOne(name);
 
     if (!carriageType) {
@@ -185,40 +192,50 @@ export class CarriageService {
       });
     }
 
-    carriageType.name = updateCarriageTypeDto.name;
-
-    return await this.carriageTypeRepository.save(carriageType);
+    await this.carriageTypeRepository.update(
+      { name },
+      { name: updateCarriageTypeDto.name },
+    );
+    return { success: true };
   }
 
-  async getSittingsInCarriage(carriageId: string): Promise<Ticket[][]> {
+  async getFreeSittingsInCarriage(freeSittingsDto: FreeSittingsDto) {
     const carriage = await this.carriageRepository.findOne(
-      { id: carriageId },
-      { relations: ['sittings'] },
+      freeSittingsDto.carriageId,
     );
 
     if (!carriage) {
       throw new NotFoundException({
         success: false,
-        message: `Carriage #${carriageId} not found`,
+        message: `Carriage #${freeSittingsDto.carriageId} does not exist`,
       });
     }
 
-    const sittings = await this.sittingRepository.find({
-      relations: ['tickets', 'carriage'],
-      where: {
-        carriage,
-      },
-    });
-
-    const freeSittings = sittings.map((sitting) =>
-      sitting.tickets.filter(
-        (ticket) => ticket.state != 'booked' && ticket.state != 'bought',
-      ),
-    );
-
-    console.log(freeSittings);
+    const freeSittings = await this.carriageRepository.query(`
+    SELECT carriage."indexInTrain", sitting.id AS "sittingId", 
+    sitting."indexInCarriage", sitting.price, ticket.id AS "ticketId"
+    FROM carriage 
+    INNER JOIN sitting ON carriage.id = sitting."carriageId"
+    LEFT JOIN ticket ON sitting.id = ticket."sittingId" AND ticket."departureDateTime" = '${freeSittingsDto.departureDateTime}'
+    WHERE carriage.id = '${freeSittingsDto.carriageId}'
+      AND ticket.id IS NULL;
+    `);
     return freeSittings;
-  }
 
-  // async bookSitting()
+    // const sittings = await this.sittingRepository.find({
+    //   relations: ['tickets', 'carriage'],
+    //   where: {
+    //     carriage,
+    //   },
+    // });
+
+    // const freeSittings = sittings.map((sitting) =>
+    //   sitting.tickets.filter(
+    //     (ticket) => ticket.state != 'booked' && ticket.state != 'bought',
+    //   ),
+    // );
+
+    // console.log(freeSittings);
+    // return freeSittings;
+  }
 }

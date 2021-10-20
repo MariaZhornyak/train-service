@@ -7,15 +7,17 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { UpdateResult } from 'typeorm';
+import { ISuccess } from '../interface/success.interface';
 import { Ticket } from '../ticket/entities/ticket.entity';
 import { CarriageService } from './carriage.service';
 import { CreateCarriageDto } from './dto/createCarriage.dto';
 import { CreateCarriageTypeDto } from './dto/createCarriageType.dto';
+import { FreeSittingsDto } from './dto/freeSittings.dto';
 import { UpdateCarriageDto } from './dto/updateCarriage.dto';
 import { UpdateCarriageTypeDto } from './dto/updateCarriageType.dto';
 import { CarriageType } from './entities/carriage-type.entity';
 import { Carriage } from './entities/carriage.entity';
-import { Sitting } from './entities/sitting.entity';
 
 @Controller('carriages')
 export class CarriageController {
@@ -42,7 +44,7 @@ export class CarriageController {
   updateCarriage(
     @Param('id') id: string,
     @Body() updateCarriageDto: UpdateCarriageDto,
-  ): Promise<Carriage> {
+  ): Promise<ISuccess> {
     return this.carriageService.updateCarriage(id, updateCarriageDto);
   }
 
@@ -72,7 +74,7 @@ export class CarriageController {
   updateCarriageType(
     @Param('name') name: string,
     @Body() updateTrainTypeDto: UpdateCarriageTypeDto,
-  ): Promise<CarriageType> {
+  ): Promise<ISuccess> {
     return this.carriageService.updateCarriageType(name, updateTrainTypeDto);
   }
 
@@ -81,8 +83,8 @@ export class CarriageController {
     return this.carriageService.deleteCarriageType(name);
   }
 
-  @Get('get/sittings/:id')
-  getSittingsInCarriage(@Param('id') carriageId: string): Promise<Ticket[][]> {
-    return this.carriageService.getSittingsInCarriage(carriageId);
+  @Get('get/sittings')
+  getSittingsInCarriage(@Body() freeSittingsDto: FreeSittingsDto) {
+    return this.carriageService.getFreeSittingsInCarriage(freeSittingsDto);
   }
 }

@@ -1,26 +1,26 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Station } from '../../station/entities/station.entity';
 import { Train } from '../entities/train.entity';
 
 export class UpdateTrainStationDto {
-  @IsNotEmpty()
-  id: string;
+  @IsOptional()
+  id?: string;
 
-  @IsNotEmpty()
-  train: Train;
+  @IsOptional()
+  train?: Train;
 
-  @IsNotEmpty()
-  station: Station;
+  @IsOptional()
+  station?: Station;
 
-  @IsNotEmpty()
-  trainStandFromFirstStation: number;
+  @IsOptional()
+  trainStandFromFirstStation?: number;
 
-  @IsNotEmpty()
-  trainStandFromLastStation: number;
+  @IsOptional()
+  trainStandFromLastStation?: number;
 
-  @IsNotEmpty()
-  wayFromFirstStation: number;
+  @IsOptional()
+  wayFromFirstStation?: number;
 
-  @IsNotEmpty()
-  wayFromLastStation: number;
+  @IsOptional()
+  wayFromLastStation?: number;
 }

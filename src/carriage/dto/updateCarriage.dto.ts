@@ -1,5 +1,4 @@
 import { IsOptional } from 'class-validator';
-import { Train } from '../../train/entities/train.entity';
 import { CarriageType } from '../entities/carriage-type.entity';
 
 export class UpdateCarriageDto {
@@ -10,5 +9,5 @@ export class UpdateCarriageDto {
   type?: CarriageType;
 
   @IsOptional()
-  train?: Train;
+  trainId?: string;
 }

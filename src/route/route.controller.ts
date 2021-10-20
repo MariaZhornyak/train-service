@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { ISuccess } from '../interface/success.interface';
 import { Station } from '../station/entities/station.entity';
 import { Train } from '../train/entities/train.entity';
 import { CreateRouteDto } from './dto/createRoute.dto';
@@ -40,7 +41,7 @@ export class RouteController {
   updateRoute(
     @Param('id') id: string,
     @Body() updateRouteDto: UpdateRouteDto,
-  ): Promise<Route> {
+  ): Promise<ISuccess> {
     return this.routeService.updateRoute(id, updateRouteDto);
   }
 
@@ -75,7 +76,7 @@ export class RouteController {
   updateRouteStation(
     @Param('id') id: string,
     @Body() updateRouteStationDto: UpdateRouteStationDto,
-  ): Promise<RouteStation> {
+  ): Promise<ISuccess> {
     return this.routeService.updateRouteStation(id, updateRouteStationDto);
   }
 
@@ -87,5 +88,10 @@ export class RouteController {
   @Get('route/:id/trains')
   getTrainsOfRoute(@Param('id') routeId: string): Promise<Train[]> {
     return this.routeService.getTrainsOfRoute(routeId);
+  }
+
+  @Get('get/schedule/:id')
+  getScheduleOfTrainsAtRoute(@Param('id') routeId: string) {
+    return this.routeService.getSchduleOfTrainsAtRoute(routeId);
   }
 }

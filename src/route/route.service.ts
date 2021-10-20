@@ -4,7 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { stringify } from 'querystring';
 import { Repository } from 'typeorm';
+import { ISuccess } from '../interface/success.interface';
 import { Station } from '../station/entities/station.entity';
 import { Train } from '../train/entities/train.entity';
 import { CreateRouteDto } from './dto/createRoute.dto';
@@ -81,7 +83,7 @@ export class RouteService {
   async updateRoute(
     id: string,
     updateRouteDto: UpdateRouteDto,
-  ): Promise<Route> {
+  ): Promise<ISuccess> {
     const route = await this.routeRepository.findOne(id);
 
     if (!route) {
@@ -91,9 +93,16 @@ export class RouteService {
       });
     }
 
-    route.name = updateRouteDto.name;
+    const newObj = {};
 
-    return await this.routeRepository.save(route);
+    for (const key in updateRouteDto) {
+      if (updateRouteDto[key] != undefined) {
+        newObj[key] = updateRouteDto[key];
+      }
+    }
+
+    await this.routeRepository.update({ id }, newObj);
+    return { success: true };
   }
 
   async createRouteStation(
@@ -206,7 +215,7 @@ export class RouteService {
   async updateRouteStation(
     id: string,
     updateRouteStationDto: UpdateRouteStationDto,
-  ): Promise<RouteStation> {
+  ): Promise<ISuccess> {
     const routeStation = await this.routeStationRepository.findOne(id);
 
     if (!routeStation) {
@@ -216,12 +225,16 @@ export class RouteService {
       });
     }
 
-    routeStation.route = updateRouteStationDto.route;
-    routeStation.station = updateRouteStationDto.station;
-    routeStation.stationIndexOnTheRoute =
-      updateRouteStationDto.stationIndexOnTheRoute;
+    const newObj = {};
 
-    return await this.routeStationRepository.save(routeStation);
+    for (const key in updateRouteStationDto) {
+      if (updateRouteStationDto[key] != undefined) {
+        newObj[key] = updateRouteStationDto[key];
+      }
+    }
+
+    await this.routeStationRepository.update({ id }, newObj);
+    return { success: true };
   }
 
   async getStationsOfRoute(routeId: string): Promise<Station[]> {
@@ -264,4 +277,31 @@ export class RouteService {
     }
     return route.trains;
   }
+
+  async getSchduleOfTrainsAtRoute(routeId: string) {
+    const route = await this.routeRepository.findOne({
+      id: routeId,
+    });
+
+    if (!route) {
+      throw new NotFoundException({
+        success: false,
+        message: `Station #${routeId} does not exist`,
+      });
+    }
+
+    const schedule = await this.routeRepository.query(`
+      SELECT train.id, route.name, train_departure.day, train_departure.time, train_departure.direction 
+      FROM route
+      INNER JOIN train ON route.id = train."routeId"
+      INNER JOIN train_departure ON train.id = train_departure."trainId"
+        WHERE route.id = '${routeId}'
+    `);
+    return schedule;
+  }
+
+  // async getRouteWithSuchTwoStations(firstStationId: string, lastStationId: string) {
+  //   const firstStation = await this.stationRepository.findOne({
+  //   })
+  // }
 }
