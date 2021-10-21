@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ICurrentUser } from '../interface/current-user.interface';
 import { ISuccess } from '../interface/success.interface';
 import { CreateTicketDto } from './dto/createTicket.dto';
 import { UpdateTicketDto } from './dto/updateTicket.dto';
@@ -55,10 +56,11 @@ export class TicketService {
   async createTicket(
     createTicketDto: CreateTicketDto,
     state: State,
+    user: ICurrentUser,
   ): Promise<Ticket> {
     const ticket = await this.ticketRepository.findOne({
       departureDateTime: createTicketDto.departureDateTime,
-      sitting: createTicketDto.sitting,
+      sittingId: createTicketDto.sittingId,
     });
 
     if (ticket) {
@@ -70,10 +72,14 @@ export class TicketService {
 
     const newTicket = new Ticket();
 
-    newTicket.sitting = createTicketDto.sitting;
+    newTicket.sittingId = createTicketDto.sittingId;
     newTicket.state = state;
+    newTicket.documentType = createTicketDto.documentType;
+    newTicket.documentNumber = createTicketDto.documentNumber;
     newTicket.departureDateTime = createTicketDto.departureDateTime;
-    // newTicket.userId = createTicketDto.userId;
+    newTicket.departureStationId = createTicketDto.departureStationId;
+    newTicket.arrivalStationId = createTicketDto.arrivalStationId;
+    newTicket.userId = user.id;
 
     return await this.ticketRepository.save(newTicket);
   }

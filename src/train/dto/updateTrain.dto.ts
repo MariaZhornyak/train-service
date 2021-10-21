@@ -1,11 +1,12 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
-import { Route } from '../../route/entities/route.entity';
-import { TrainType } from '../entities/trainType.entity';
 
 export class UpdateTrainDto {
+  @ApiProperty()
   @IsOptional()
-  type?: TrainType;
+  typeName?: string;
 
+  @ApiProperty()
   @IsOptional()
-  route?: Route;
+  routeId?: string;
 }

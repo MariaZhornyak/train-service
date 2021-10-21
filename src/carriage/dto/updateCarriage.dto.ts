@@ -1,13 +1,18 @@
-import { IsOptional } from 'class-validator';
-import { CarriageType } from '../entities/carriage-type.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsUUID } from 'class-validator';
 
 export class UpdateCarriageDto {
+  @ApiProperty()
   @IsOptional()
+  @IsNumber()
   indexInTrain?: number;
 
+  @ApiProperty()
   @IsOptional()
-  type?: CarriageType;
+  typeName?: string;
 
+  @ApiProperty()
   @IsOptional()
+  @IsUUID('4')
   trainId?: string;
 }

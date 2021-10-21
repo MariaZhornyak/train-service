@@ -1,9 +1,9 @@
-import { IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateTrainTypeDto {
+  @ApiProperty()
   @IsNotEmpty()
-  id: string;
-
-  @IsNotEmpty()
+  @IsString()
   name: string;
 }

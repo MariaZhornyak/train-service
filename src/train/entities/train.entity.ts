@@ -1,4 +1,11 @@
-import { Entity, Column, OneToMany, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  OneToMany,
+  ManyToOne,
+  PrimaryColumn,
+  JoinColumn,
+} from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Carriage } from '../../carriage/entities/carriage.entity';
 import { Route } from '../../route/entities/route.entity';
@@ -15,13 +22,21 @@ export class Train {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'typeId' })
   type: TrainType;
+
+  @Column()
+  typeName: string;
 
   @ManyToOne(() => Route, (route) => route.trains, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'routeId' })
   route: Route;
+
+  @Column()
+  routeId: string;
 
   @OneToMany(() => Carriage, (carriage) => carriage.train)
   carriages: Carriage[];

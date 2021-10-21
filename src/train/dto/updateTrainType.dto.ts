@@ -1,9 +1,9 @@
-import { IsOptional } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateTrainTypeDto {
+  @ApiProperty()
   @IsOptional()
-  id?: string;
-
-  @IsOptional()
+  @IsString()
   name?: string;
 }

@@ -6,10 +6,19 @@ import { TrainStation } from '../station/entities/trainStation.entity';
 import { TrainController } from './train.controller';
 import { TrainService } from './train.service';
 import { TrainDeparture } from './entities/trainDeparture.entity';
+import { Route } from '../route/entities/route.entity';
+import { Station } from '../station/entities/station.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Train, TrainType, TrainStation, TrainDeparture]),
+    TypeOrmModule.forFeature([
+      Train,
+      TrainType,
+      TrainStation,
+      TrainDeparture,
+      Route,
+      Station,
+    ]),
   ],
   controllers: [TrainController],
   providers: [TrainService],

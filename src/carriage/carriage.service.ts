@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ISuccess } from '../interface/success.interface';
-import { Ticket } from '../ticket/entities/ticket.entity';
+import { Train } from '../train/entities/train.entity';
 import { CreateCarriageDto } from './dto/createCarriage.dto';
 import { CreateCarriageTypeDto } from './dto/createCarriageType.dto';
 import { FreeSittingsDto } from './dto/freeSittings.dto';
@@ -25,6 +25,8 @@ export class CarriageService {
     private carriageTypeRepository: Repository<CarriageType>,
     @InjectRepository(Sitting)
     private sittingRepository: Repository<Sitting>,
+    @InjectRepository(Train)
+    private trainRepository: Repository<Train>,
   ) {}
 
   async getCarriagesList(): Promise<Carriage[]> {
@@ -73,13 +75,35 @@ export class CarriageService {
     if (carriage) {
       throw new BadRequestException({
         success: false,
-        message: 'Carriage already exists.',
+        message: 'Carriage with such number in this train already exists.',
+      });
+    }
+
+    const carriageType = await this.carriageTypeRepository.findOne({
+      name: createCarriageDto.typeName,
+    });
+
+    if (!carriageType) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such carriage type does not exist',
+      });
+    }
+
+    const train = await this.trainRepository.findOne({
+      id: createCarriageDto.trainId,
+    });
+
+    if (!train) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such train does not exist',
       });
     }
 
     const newCarriage = new Carriage();
 
-    newCarriage.type = createCarriageDto.type;
+    newCarriage.typeName = createCarriageDto.typeName;
     newCarriage.trainId = createCarriageDto.trainId;
     newCarriage.indexInTrain = createCarriageDto.indexInTrain;
 
@@ -108,6 +132,28 @@ export class CarriageService {
       throw new NotFoundException({
         success: false,
         message: `Carriage #${id} not found`,
+      });
+    }
+
+    const carriageType = await this.carriageTypeRepository.findOne({
+      name: updateCarriageDto.typeName,
+    });
+
+    if (!carriageType) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such carriage type does not exist',
+      });
+    }
+
+    const train = await this.trainRepository.findOne({
+      id: updateCarriageDto.trainId,
+    });
+
+    if (!train) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such train does not exist',
       });
     }
 

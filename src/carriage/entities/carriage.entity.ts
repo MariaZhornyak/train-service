@@ -24,7 +24,11 @@ export class Carriage {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'typeName' })
   type: CarriageType;
+
+  @Column()
+  typeName: string;
 
   @OneToMany(() => Sitting, (sitting) => sitting.carriage)
   sittings: Sitting[];

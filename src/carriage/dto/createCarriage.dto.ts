@@ -1,19 +1,28 @@
-import { IsNotEmpty } from 'class-validator';
-import { CarriageType } from '../entities/carriage-type.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
 export class CreateCarriageDto {
+  @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
   indexInTrain: number;
 
+  @ApiProperty()
   @IsNotEmpty()
-  type: CarriageType;
+  typeName: string;
 
+  @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
   sittings: number;
 
+  @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
   priceOfSitting: number;
 
+  @ApiProperty()
   @IsNotEmpty()
+  @IsUUID('4')
   trainId: string;
 }

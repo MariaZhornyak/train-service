@@ -1,17 +1,19 @@
-import { IsOptional } from 'class-validator';
-import { Station } from '../../station/entities/station.entity';
-import { Route } from '../entities/route.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsUUID } from 'class-validator';
 
 export class UpdateRouteStationDto {
+  @ApiProperty()
   @IsOptional()
-  id?: string;
+  @IsUUID('4')
+  routeId?: string;
 
+  @ApiProperty()
   @IsOptional()
-  route?: Route;
+  @IsUUID('4')
+  stationId?: string;
 
+  @ApiProperty()
   @IsOptional()
-  station?: Station;
-
-  @IsOptional()
+  @IsNumber()
   stationIndexOnTheRoute?: number;
 }

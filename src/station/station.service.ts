@@ -13,6 +13,7 @@ import { CreateStationDto } from './dto/createStation.dto';
 import { UpdateStationDto } from './dto/updateStation.dto';
 import { Station } from './entities/station.entity';
 import { ISuccess } from '../interface/success.interface';
+import { RouteFromStatioToStationDto } from './dto/getRouteFromStationToStation.dto';
 
 @Injectable()
 export class StationService {
@@ -169,5 +170,61 @@ export class StationService {
       WHERE station.id = '${stationId}'
     `);
     return schedule;
+  }
+
+  async getRouteFromStationToStation(
+    routeFromStationToStationDto: RouteFromStatioToStationDto,
+  ) {
+    const firstStation = await this.stationRepository.findOne(
+      routeFromStationToStationDto.firstStationId,
+    );
+    if (!firstStation) {
+      throw new BadRequestException({
+        success: false,
+        message: `Station №${routeFromStationToStationDto.firstStationId} does not exist`,
+      });
+    }
+
+    const secondStation = await this.stationRepository.findOne(
+      routeFromStationToStationDto.secondStationId,
+    );
+    if (!secondStation) {
+      throw new BadRequestException({
+        success: false,
+        message: `Station №${routeFromStationToStationDto.secondStationId} does not exist`,
+      });
+    }
+
+    const queryForFirstStation = await this.stationRepository.query(`
+      SELECT route.name, train.id FROM station
+      INNER JOIN route_station ON station.id = route_station."stationId"
+      INNER JOIN route ON route_station."routeId" = route.id
+      INNER JOIN train ON route.id = train."routeId"
+      WHERE station.id = '${routeFromStationToStationDto.firstStationId}'
+    `);
+
+    const queryForSecondStation = await this.stationRepository.query(`
+      SELECT route.name, train.id FROM station
+      INNER JOIN route_station ON station.id = route_station."stationId"
+      INNER JOIN route ON route_station."routeId" = route.id
+      INNER JOIN train ON route.id = train."routeId"
+      WHERE station.id = '${routeFromStationToStationDto.secondStationId}'
+    `);
+
+    const queryResult = [];
+    for (const item of queryForFirstStation) {
+      if (queryForSecondStation.some((item2) => item2.name == item.name)) {
+        queryResult.push(item);
+      }
+    }
+
+    if (queryResult.length === 0) {
+      throw new BadRequestException({
+        success: false,
+        message: `Such route does not exist`,
+      });
+    }
+
+    return queryResult;
   }
 }

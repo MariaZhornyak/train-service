@@ -5,6 +5,7 @@ import {
   PrimaryColumn,
   CreateDateColumn,
   Index,
+  JoinColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { State } from '../enums/state.enum';
@@ -16,17 +17,39 @@ export class Ticket {
   @PrimaryColumn({ type: 'uuid' })
   id: string = uuid();
 
+  @Column()
+  userId: string;
+
   // @Column()
-  // userId: string;
+  // name: string;
+
+  // @Column()
+  // surname: string;
+
+  @Column()
+  documentType: string;
+
+  @Column()
+  documentNumber: string;
 
   @ManyToOne(() => Sitting, (sitting) => sitting.tickets, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'sittingId' })
   sitting: Sitting;
+
+  @Column()
+  sittingId: string;
 
   @Column({ type: 'timestamptz' })
   departureDateTime: Date;
+
+  @Column()
+  departureStationId: string;
+
+  @Column()
+  arrivalStationId: string;
 
   @Column({
     type: 'enum',

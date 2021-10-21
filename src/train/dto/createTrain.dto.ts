@@ -1,14 +1,12 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
-import { Route } from '../../route/entities/route.entity';
-import { TrainType } from '../entities/trainType.entity';
 
 export class CreateTrainDto {
+  @ApiProperty()
   @IsNotEmpty()
-  id: string;
+  typeName: string;
 
+  @ApiProperty()
   @IsNotEmpty()
-  type: TrainType;
-
-  @IsNotEmpty()
-  route: Route;
+  routeId: string;
 }

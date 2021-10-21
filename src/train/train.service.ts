@@ -17,6 +17,9 @@ import { TrainStation } from '../station/entities/trainStation.entity';
 import { TrainDeparture } from './entities/trainDeparture.entity';
 import { CreateTrainDepartureDto } from './dto/createTrainDeparture.dto';
 import { ISuccess } from '../interface/success.interface';
+import { ICurrentUser } from '../interface/current-user.interface';
+import { Route } from '../route/entities/route.entity';
+import { Station } from '../station/entities/station.entity';
 
 @Injectable()
 export class TrainService {
@@ -28,6 +31,10 @@ export class TrainService {
     private trainStationRepository: Repository<TrainStation>,
     @InjectRepository(TrainDeparture)
     private trainDepartureRepository: Repository<TrainDeparture>,
+    @InjectRepository(Route)
+    private routeRepository: Repository<Route>,
+    @InjectRepository(Station)
+    private stationRepository: Repository<Station>,
   ) {}
 
   async getTrainsList(): Promise<Train[]> {
@@ -66,21 +73,32 @@ export class TrainService {
   }
 
   async createTrain(createTrainDto: CreateTrainDto): Promise<Train> {
-    const train = await this.trainRepository.findOne({
-      id: createTrainDto.id,
+    const trainType = await this.trainTypeRepository.findOne({
+      name: createTrainDto.typeName,
     });
 
-    if (train) {
+    if (!trainType) {
       throw new BadRequestException({
         success: false,
-        message: 'Train already exists.',
+        message: 'Such train type does not exist',
+      });
+    }
+
+    const route = await this.routeRepository.findOne({
+      id: createTrainDto.routeId,
+    });
+
+    if (!route) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such route does not exist',
       });
     }
 
     const newTrain = new Train();
 
-    newTrain.type = createTrainDto.type;
-    newTrain.route = createTrainDto.route;
+    newTrain.typeName = createTrainDto.typeName;
+    newTrain.routeId = createTrainDto.routeId;
 
     return await this.trainRepository.save(newTrain);
   }
@@ -92,6 +110,28 @@ export class TrainService {
       throw new NotFoundException({
         success: false,
         message: `Train #${id} not found`,
+      });
+    }
+
+    const trainType = await this.trainTypeRepository.findOne({
+      name: updateTrainDto.typeName,
+    });
+
+    if (!trainType) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such train type does not exist',
+      });
+    }
+
+    const route = await this.routeRepository.findOne({
+      id: updateTrainDto.routeId,
+    });
+
+    if (!route) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such route does not exist',
       });
     }
 
@@ -146,7 +186,7 @@ export class TrainService {
     createTrainTypeDto: CreateTrainTypeDto,
   ): Promise<TrainType> {
     const trainType = await this.trainRepository.findOne({
-      id: createTrainTypeDto.id,
+      typeName: createTrainTypeDto.name,
     });
 
     if (trainType) {
@@ -186,21 +226,44 @@ export class TrainService {
   async createTrainStation(
     createTrainStationDto: CreateTrainStationDto,
   ): Promise<TrainStation> {
+    const station = await this.stationRepository.findOne({
+      id: createTrainStationDto.stationId,
+    });
+
+    if (!station) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such station does not exist',
+      });
+    }
+
+    const train = await this.trainRepository.findOne({
+      id: createTrainStationDto.trainId,
+    });
+
+    if (!train) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Such train does not exist',
+      });
+    }
+
     const trainStation = await this.trainStationRepository.findOne({
-      id: createTrainStationDto.id,
+      trainId: createTrainStationDto.trainId,
+      stationId: createTrainStationDto.stationId,
     });
 
     if (trainStation) {
       throw new BadRequestException({
         success: false,
-        message: 'Route with such stations already exists.',
+        message: 'Such train, which is passing by this station, already exists',
       });
     }
 
     const newTrainStation = new TrainStation();
 
-    newTrainStation.train = createTrainStationDto.train;
-    newTrainStation.station = createTrainStationDto.station;
+    newTrainStation.trainId = createTrainStationDto.trainId;
+    newTrainStation.stationId = createTrainStationDto.stationId;
     newTrainStation.trainStandFromFirstStation =
       createTrainStationDto.trainStandFromFirstStation;
     newTrainStation.trainStandFromLastStation =
@@ -213,40 +276,40 @@ export class TrainService {
     return await this.trainStationRepository.save(newTrainStation);
   }
 
-  async getTrainStationsList(): Promise<TrainStation[]> {
-    const trainStationsList = await this.trainStationRepository.find();
-    if (!trainStationsList || trainStationsList.length === 0) {
-      throw new NotFoundException({
-        success: false,
-        message: 'Train and stations list is empty',
-      });
-    }
-    return trainStationsList;
-  }
+  // async getTrainStationsList(): Promise<TrainStation[]> {
+  //   const trainStationsList = await this.trainStationRepository.find();
+  //   if (!trainStationsList || trainStationsList.length === 0) {
+  //     throw new NotFoundException({
+  //       success: false,
+  //       message: 'Train and stations list is empty',
+  //     });
+  //   }
+  //   return trainStationsList;
+  // }
 
-  async getSingleTrainStation(id: string): Promise<TrainStation> {
-    const singleTrainAtStation = await this.trainStationRepository.findOne(id);
-    if (!singleTrainAtStation) {
-      throw new NotFoundException({
-        success: false,
-        message: `Train and station '${id}' not found`,
-      });
-    }
-    return singleTrainAtStation;
-  }
+  // async getSingleTrainStation(id: string): Promise<TrainStation> {
+  //   const singleTrainAtStation = await this.trainStationRepository.findOne(id);
+  //   if (!singleTrainAtStation) {
+  //     throw new NotFoundException({
+  //       success: false,
+  //       message: `Train and station '${id}' not found`,
+  //     });
+  //   }
+  //   return singleTrainAtStation;
+  // }
 
-  async deleteTrainStation(id: string): Promise<TrainStation> {
-    const trainStation = await this.trainStationRepository.findOne(id);
+  // async deleteTrainStation(id: string): Promise<TrainStation> {
+  //   const trainStation = await this.trainStationRepository.findOne(id);
 
-    if (!trainStation) {
-      throw new NotFoundException({
-        success: false,
-        message: `Train and station '${id}' not found`,
-      });
-    }
+  //   if (!trainStation) {
+  //     throw new NotFoundException({
+  //       success: false,
+  //       message: `Train and station '${id}' not found`,
+  //     });
+  //   }
 
-    return await this.trainStationRepository.remove(trainStation);
-  }
+  //   return await this.trainStationRepository.remove(trainStation);
+  // }
 
   async updateTrainStation(
     id: string,
@@ -278,7 +341,7 @@ export class TrainService {
   ): Promise<TrainDeparture> {
     const trainDeparture = await this.trainDepartureRepository.findOne(
       {
-        train: createTrainDepartureDto.train,
+        trainId: createTrainDepartureDto.trainId,
         day: createTrainDepartureDto.day,
         time: createTrainDepartureDto.time,
       },
@@ -294,7 +357,7 @@ export class TrainService {
 
     const newTrainDeparture = new TrainDeparture();
 
-    newTrainDeparture.train = createTrainDepartureDto.train;
+    newTrainDeparture.trainId = createTrainDepartureDto.trainId;
     newTrainDeparture.time = createTrainDepartureDto.time;
     newTrainDeparture.direction = createTrainDepartureDto.direction;
     newTrainDeparture.day = createTrainDepartureDto.day;
@@ -316,9 +379,8 @@ export class TrainService {
     SELECT train.id, route.name, train_departure.day, train_departure.time 
     FROM train 
     INNER JOIN train_departure ON train.id = train_departure."trainId"
-    INNER JOIN train_station ON train.id = train_station."trainId"
     INNER JOIN route ON train."routeId" = route.id
-      WHERE route.id = '${trainId}'
+      WHERE train.id = '${trainId}'
     `);
     return schedule;
   }

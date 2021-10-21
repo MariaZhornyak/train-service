@@ -1,19 +1,24 @@
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 import { Direction } from '../enum/direction.enum';
 import { Day } from '../enum/day.enum';
-import { Train } from '../entities/train.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTrainDepartureDto {
+  @ApiProperty()
   @IsNotEmpty()
   @IsEnum(Day)
   day: Day;
 
+  @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
   time: number;
 
+  @ApiProperty()
   @IsNotEmpty()
-  train: Train;
+  trainId: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsEnum(Direction)
   direction: Direction;

@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import { Day } from '../enum/day.enum';
@@ -23,8 +23,11 @@ export class TrainDeparture {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  // @JoinColumn({ name: 'trainId' })
+  @JoinColumn({ name: 'trainId' })
   train: Train;
+
+  @Column()
+  trainId: string;
 
   @Column({
     type: 'enum',

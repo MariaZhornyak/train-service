@@ -177,51 +177,54 @@ export class RouteService {
     return await this.routeStationRepository.save(newRouteStation);
   }
 
-  async getRouteStationsList(): Promise<RouteStation[]> {
-    const trainStationsList = await this.routeStationRepository.find();
-    if (!trainStationsList || trainStationsList.length === 0) {
-      throw new NotFoundException({
-        success: false,
-        message: 'Train and stations list is empty',
-      });
-    }
-    return trainStationsList;
-  }
+  // async getRouteStationsList(): Promise<RouteStation[]> {
+  //   const trainStationsList = await this.routeStationRepository.find();
+  //   if (!trainStationsList || trainStationsList.length === 0) {
+  //     throw new NotFoundException({
+  //       success: false,
+  //       message: 'Train and stations list is empty',
+  //     });
+  //   }
+  //   return trainStationsList;
+  // }
 
-  async getSingleRouteStation(id: string): Promise<RouteStation> {
-    const singleRouteAndStation = await this.routeStationRepository.findOne(id);
-    if (!singleRouteAndStation) {
-      throw new NotFoundException({
-        success: false,
-        message: `Train and station '${id}' not found`,
-      });
-    }
-    return singleRouteAndStation;
-  }
+  // async getSingleRouteStation(id: string): Promise<RouteStation> {
+  //   const singleRouteAndStation = await this.routeStationRepository.findOne(id);
+  //   if (!singleRouteAndStation) {
+  //     throw new NotFoundException({
+  //       success: false,
+  //       message: `Train and station '${id}' not found`,
+  //     });
+  //   }
+  //   return singleRouteAndStation;
+  // }
 
-  async deleteRouteStation(id: string): Promise<RouteStation> {
-    const routeStation = await this.routeStationRepository.findOne(id);
+  // async deleteRouteStation(id: string): Promise<RouteStation> {
+  //   const routeStation = await this.routeStationRepository.findOne(id);
 
-    if (!routeStation) {
-      throw new NotFoundException({
-        success: false,
-        message: `Train and station '${id}' not found`,
-      });
-    }
+  //   if (!routeStation) {
+  //     throw new NotFoundException({
+  //       success: false,
+  //       message: `Train and station '${id}' not found`,
+  //     });
+  //   }
 
-    return await this.routeStationRepository.remove(routeStation);
-  }
+  //   return await this.routeStationRepository.remove(routeStation);
+  // }
 
   async updateRouteStation(
     id: string,
     updateRouteStationDto: UpdateRouteStationDto,
   ): Promise<ISuccess> {
-    const routeStation = await this.routeStationRepository.findOne(id);
+    const routeStation = await this.routeStationRepository.findOne({
+      routeId: updateRouteStationDto.routeId,
+      stationId: updateRouteStationDto.stationId,
+    });
 
     if (!routeStation) {
       throw new NotFoundException({
         success: false,
-        message: `Train and station #${id} not found`,
+        message: `Such station is already in the route`,
       });
     }
 
@@ -286,7 +289,7 @@ export class RouteService {
     if (!route) {
       throw new NotFoundException({
         success: false,
-        message: `Station #${routeId} does not exist`,
+        message: `Route #${routeId} does not exist`,
       });
     }
 
@@ -299,9 +302,4 @@ export class RouteService {
     `);
     return schedule;
   }
-
-  // async getRouteWithSuchTwoStations(firstStationId: string, lastStationId: string) {
-  //   const firstStation = await this.stationRepository.findOne({
-  //   })
-  // }
 }

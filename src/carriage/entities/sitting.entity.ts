@@ -1,4 +1,11 @@
-import { Entity, Column, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+  JoinColumn,
+} from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
 import { Carriage } from './carriage.entity';
@@ -19,7 +26,11 @@ export class Sitting {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'carriageId' })
   carriage: Carriage;
+
+  @Column()
+  carriageId: string;
 
   @OneToMany(() => Ticket, (ticket) => ticket.sitting)
   tickets: Ticket[];

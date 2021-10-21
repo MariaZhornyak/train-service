@@ -1,26 +1,32 @@
-import { IsNotEmpty } from 'class-validator';
-import { Station } from '../../station/entities/station.entity';
-import { Train } from '../entities/train.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateTrainStationDto {
+  @ApiProperty()
   @IsNotEmpty()
-  id: string;
+  trainId: string;
 
+  @ApiProperty()
   @IsNotEmpty()
-  train: Train;
+  stationId: string;
 
+  @ApiProperty()
   @IsNotEmpty()
-  station: Station;
-
-  @IsNotEmpty()
+  @IsNumber()
   trainStandFromFirstStation: number;
 
+  @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
   trainStandFromLastStation: number;
 
+  @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
   wayFromFirstStation: number;
 
+  @ApiProperty()
   @IsNotEmpty()
+  @IsNumber()
   wayFromLastStation: number;
 }
