@@ -1,27 +1,34 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   OneToMany,
   ManyToOne,
+  PrimaryColumn,
+  JoinColumn,
 } from 'typeorm';
+import { v4 as uuid } from 'uuid';
+
 import { CarriageType } from './carriage-type.entity';
 import { Sitting } from './sitting.entity';
-import { Train } from './train.entity';
+import { Train } from '../../train/entities/train.entity';
 
 @Entity('carriage')
 export class Carriage {
-  @PrimaryGeneratedColumn()
-  id: string;
+  @PrimaryColumn({ type: 'uuid' })
+  id: string = uuid();
 
   @Column()
   indexInTrain: number;
 
-  @ManyToOne(() => CarriageType, (carriageType) => carriageType.carriage, {
+  @ManyToOne(() => CarriageType, (carriageType) => carriageType.carriages, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'typeName' })
   type: CarriageType;
+
+  @Column()
+  typeName: string;
 
   @OneToMany(() => Sitting, (sitting) => sitting.carriage)
   sittings: Sitting[];
@@ -30,5 +37,9 @@ export class Carriage {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'trainId' })
   train: Train;
+
+  @Column()
+  trainId: string;
 }
