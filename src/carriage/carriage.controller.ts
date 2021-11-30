@@ -21,7 +21,7 @@ import { UpdateCarriageDto } from './dto/updateCarriage.dto';
 import { UpdateCarriageTypeDto } from './dto/updateCarriageType.dto';
 import { CarriageType } from './entities/carriage-type.entity';
 import { Carriage } from './entities/carriage.entity';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('carriages')
 @ApiBearerAuth()
@@ -29,6 +29,7 @@ export class CarriageController {
   constructor(private readonly carriageService: CarriageService) {}
 
   @Get('get/list')
+  @ApiTags('carriages')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getCarriagesList(): Promise<Carriage[]> {
@@ -36,6 +37,7 @@ export class CarriageController {
   }
 
   @Get('get/single/:id')
+  @ApiTags('carriages')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getSingleCarriage(@Param('id') id: string): Promise<Carriage> {
@@ -43,6 +45,7 @@ export class CarriageController {
   }
 
   @Post('create')
+  @ApiTags('carriages')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createCarriage(
@@ -52,6 +55,7 @@ export class CarriageController {
   }
 
   @Patch('update/:id')
+  @ApiTags('carriages')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateCarriage(
@@ -62,6 +66,7 @@ export class CarriageController {
   }
 
   @Delete('delete/:id')
+  @ApiTags('carriages')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   deleteCarriage(@Param('id') id: string): Promise<Carriage> {
@@ -69,6 +74,7 @@ export class CarriageController {
   }
 
   @Get('/types/get/list')
+  @ApiTags('carriage types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   getCarriageTypesList(): Promise<CarriageType[]> {
@@ -76,6 +82,7 @@ export class CarriageController {
   }
 
   @Get('/types/get/:name')
+  @ApiTags('carriage types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   getSingleCarriageType(@Param('name') name: string): Promise<CarriageType> {
@@ -83,6 +90,7 @@ export class CarriageController {
   }
 
   @Post('/types/create')
+  @ApiTags('carriage types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createCarriageType(
@@ -92,6 +100,7 @@ export class CarriageController {
   }
 
   @Patch('/types/update/:name')
+  @ApiTags('carriage types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateCarriageType(
@@ -102,6 +111,7 @@ export class CarriageController {
   }
 
   @Delete('/types/delete/:name')
+  @ApiTags('carriage types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   deleteCarriageType(@Param('name') name: string): Promise<CarriageType> {
@@ -109,6 +119,7 @@ export class CarriageController {
   }
 
   @Get('get/sittings')
+  @ApiTags('free sittings in carriage')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Headmaster, Roles.Passenger)
   getFreeSittingsInCarriage(@Query() freeSittingsDto: FreeSittingsDto) {

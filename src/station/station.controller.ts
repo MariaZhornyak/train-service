@@ -9,7 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../decorator/auth.decorator';
 import { Roles } from '../enum/roles.enum';
 import { AuthGuard } from '../guard/auth.guard';
@@ -28,6 +28,7 @@ export class StationController {
   constructor(private readonly stationService: StationService) {}
 
   @Get('get/list')
+  @ApiTags('stations')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getStationsList(): Promise<Station[]> {
@@ -35,6 +36,7 @@ export class StationController {
   }
 
   @Get('get/:id')
+  @ApiTags('stations')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getSingleStation(@Param('id') id: string): Promise<Station> {
@@ -42,6 +44,7 @@ export class StationController {
   }
 
   @Post('create')
+  @ApiTags('stations')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createStation(@Body() createStationDto: CreateStationDto): Promise<Station> {
@@ -49,6 +52,7 @@ export class StationController {
   }
 
   @Patch('update/:id')
+  @ApiTags('stations')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateStation(
@@ -59,6 +63,7 @@ export class StationController {
   }
 
   @Delete('delete/:id')
+  @ApiTags('stations')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   deleteStation(@Param('id') id: string): Promise<Station> {
@@ -66,6 +71,7 @@ export class StationController {
   }
 
   @Get(':id/routes')
+  @ApiTags('get all routes which goes through station')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getRoutesOfStation(@Param('id') stationId: string): Promise<Route[]> {
@@ -73,6 +79,7 @@ export class StationController {
   }
 
   @Get(':id/trains')
+  @ApiTags('get all trains which goes through station')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getTrainsOfStation(@Param('id') trainId: string): Promise<Train[]> {
@@ -80,6 +87,7 @@ export class StationController {
   }
 
   @Get('schedule/:id/trains')
+  @ApiTags('get schedule of trains those go through station')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   scheduleOfTrainsAtStations(@Param('id') stationId: string) {
@@ -87,6 +95,7 @@ export class StationController {
   }
 
   @Get('get/route/between-two-stations')
+  @ApiTags('get all route between two stations')
   getRouteFromStationToStation(
     @Query() routeFromStationToStationDto: RouteFromStatioToStationDto,
   ) {

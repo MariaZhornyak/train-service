@@ -342,7 +342,6 @@ export class TrainService {
     const trainDeparture = await this.trainDepartureRepository.findOne(
       {
         trainId: createTrainDepartureDto.trainId,
-        day: createTrainDepartureDto.day,
         time: createTrainDepartureDto.time,
       },
       { relations: ['train'] },
@@ -360,7 +359,6 @@ export class TrainService {
     newTrainDeparture.trainId = createTrainDepartureDto.trainId;
     newTrainDeparture.time = createTrainDepartureDto.time;
     newTrainDeparture.direction = createTrainDepartureDto.direction;
-    newTrainDeparture.day = createTrainDepartureDto.day;
 
     return await this.trainDepartureRepository.save(newTrainDeparture);
   }

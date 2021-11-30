@@ -6,11 +6,6 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateTrainDepartureDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsEnum(Day)
-  day: Day;
-
-  @ApiProperty()
-  @IsNotEmpty()
   @IsNumber()
   time: number;
 

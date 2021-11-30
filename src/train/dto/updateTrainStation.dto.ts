@@ -1,7 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
-import { Station } from '../../station/entities/station.entity';
-import { Train } from '../entities/train.entity';
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class UpdateTrainStationDto {
   @ApiProperty()
