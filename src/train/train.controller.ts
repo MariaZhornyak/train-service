@@ -25,7 +25,7 @@ import { ISuccess } from '../interface/success.interface';
 import { AuthGuard } from '../guard/auth.guard';
 import { Roles } from '../enum/roles.enum';
 import { Auth } from '../decorator/auth.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('trains')
 @ApiBearerAuth()
@@ -33,18 +33,23 @@ export class TrainController {
   constructor(private readonly trainService: TrainService) {}
 
   @Get('/get/list')
+  @ApiTags('trains')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getTrainsList(): Promise<Train[]> {
     return this.trainService.getTrainsList();
   }
+
   @Get('get/:id')
+  @ApiTags('trains')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getSingleTrain(@Param('id') id: string): Promise<Train> {
     return this.trainService.getSingleTrain(id);
   }
+
   @Post('/create')
+  @ApiTags('trains')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createTrain(@Body() createTrainDto: CreateTrainDto): Promise<Train> {
@@ -52,6 +57,7 @@ export class TrainController {
   }
 
   @Patch('update/:id')
+  @ApiTags('trains')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateTrain(
@@ -62,6 +68,7 @@ export class TrainController {
   }
 
   @Delete('delete/:id')
+  @ApiTags('trains')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   deleteTrain(@Param('id') id: string): Promise<Train> {
@@ -69,6 +76,7 @@ export class TrainController {
   }
 
   @Get('/types/get/list')
+  @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   getTrainsTypesList(): Promise<TrainType[]> {
@@ -76,12 +84,14 @@ export class TrainController {
   }
 
   @Get('/types/get/:name')
+  @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   getSingleTrainType(@Param('name') name: string): Promise<TrainType> {
     return this.trainService.getSingleTrainType(name);
   }
   @Post('/types/create')
+  @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createTrainType(
@@ -91,6 +101,7 @@ export class TrainController {
   }
 
   @Put('/types/update/:name')
+  @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateTrainType(
@@ -101,6 +112,7 @@ export class TrainController {
   }
 
   @Delete('/types/delete/:name')
+  @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   deleteTrainType(@Param('name') name: string): Promise<TrainType> {
@@ -129,6 +141,7 @@ export class TrainController {
   // }
 
   @Post('at-station/create')
+  @ApiTags('add train to station')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createTrainStation(
@@ -138,6 +151,7 @@ export class TrainController {
   }
 
   @Patch('at-station/update/:id')
+  @ApiTags('update info about train and station')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateTrainStation(
@@ -148,6 +162,7 @@ export class TrainController {
   }
 
   @Post('departure-date/create')
+  @ApiTags('departure date')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createTrainDeparture(
@@ -157,6 +172,7 @@ export class TrainController {
   }
 
   @Get('get/schedule/:id')
+  @ApiTags('get train`s schedule')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Headmaster, Roles.Passenger)
   getScheduleOfTrainsById(@Param('id') trainId: string) {

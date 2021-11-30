@@ -294,7 +294,7 @@ export class RouteService {
     }
 
     const schedule = await this.routeRepository.query(`
-      SELECT train.id, route.name, train_departure.day, train_departure.time, train_departure.direction 
+      SELECT train.id, route.name, train_departure.time, train_departure.direction 
       FROM route
       INNER JOIN train ON route.id = train."routeId"
       INNER JOIN train_departure ON train.id = train_departure."trainId"
