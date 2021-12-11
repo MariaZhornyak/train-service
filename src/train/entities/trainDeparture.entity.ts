@@ -10,12 +10,6 @@ export class TrainDeparture {
   @PrimaryColumn({ type: 'uuid' })
   id: string = uuid();
 
-  @Column({
-    type: 'enum',
-    enum: Day,
-  })
-  day: Day;
-
   @Column()
   time: number;
 

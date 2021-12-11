@@ -21,7 +21,7 @@ import { UpdateRouteStationDto } from './dto/updateRoutestation.dto';
 import { Route } from './entities/route.entity';
 import { RouteStation } from './entities/routeStation.entity';
 import { RouteService } from './route.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('routes')
 @ApiBearerAuth()
@@ -29,6 +29,7 @@ export class RouteController {
   constructor(private readonly routeService: RouteService) {}
 
   @Get('get/list')
+  @ApiTags('routes')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getRoutesList(): Promise<Route[]> {
@@ -36,6 +37,7 @@ export class RouteController {
   }
 
   @Get('get/:id')
+  @ApiTags('routes')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
   getSingleRoute(@Param('id') id: string): Promise<Route> {
@@ -43,6 +45,7 @@ export class RouteController {
   }
 
   @Post('create')
+  @ApiTags('routes')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createRoute(@Body() createRouteDto: CreateRouteDto): Promise<Route> {
@@ -50,6 +53,7 @@ export class RouteController {
   }
 
   @Patch('update/:id')
+  @ApiTags('routes')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateRoute(
@@ -60,6 +64,7 @@ export class RouteController {
   }
 
   @Delete('delete/:id')
+  @ApiTags('routes')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   deleteRoute(@Param('id') id: string): Promise<Route> {
@@ -87,7 +92,8 @@ export class RouteController {
   //   return this.routeService.deleteRouteStation(id);
   // }
 
-  @Post('stations-on-route/create')
+  @Post('stations/create')
+  @ApiTags('add station to route')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createRouteStation(
@@ -96,7 +102,8 @@ export class RouteController {
     return this.routeService.createRouteStation(createRouteStationDto);
   }
 
-  @Patch('stations-on-route/update/:id')
+  @Patch('stations/update/:id')
+  @ApiTags('update info about route and station')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateRouteStation(
@@ -107,6 +114,7 @@ export class RouteController {
   }
 
   @Get('route/:id/stations')
+  @ApiTags('get list of stations at route')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Headmaster, Roles.Passenger)
   getStationsOfRoute(@Param('id') routeId: string): Promise<Station[]> {
@@ -114,6 +122,7 @@ export class RouteController {
   }
 
   @Get('route/:id/trains')
+  @ApiTags('get list of trains at route')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Headmaster, Roles.Passenger)
   getTrainsOfRoute(@Param('id') routeId: string): Promise<Train[]> {
@@ -121,6 +130,7 @@ export class RouteController {
   }
 
   @Get('get/schedule/:id')
+  @ApiTags('get schedule of trains at route')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Headmaster, Roles.Passenger)
   getScheduleOfTrainsAtRoute(@Param('id') routeId: string) {

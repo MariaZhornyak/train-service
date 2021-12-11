@@ -8,7 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../decorator/auth.decorator';
 import { CurrentUser } from '../decorator/current-user.decorator';
 import { Roles } from '../enum/roles.enum';
@@ -27,6 +27,7 @@ export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
 
   @Get('get/list')
+  @ApiTags('tickets')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   getTicketsList(): Promise<Ticket[]> {
@@ -34,6 +35,7 @@ export class TicketController {
   }
 
   @Get('get/:id')
+  @ApiTags('tickets')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   getSingleTicket(@Param('id') id: string): Promise<Ticket> {
@@ -41,6 +43,7 @@ export class TicketController {
   }
 
   @Delete('delete/:id')
+  @ApiTags('tickets')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   deleteTicket(@Param('id') id: string): Promise<Ticket> {
@@ -48,6 +51,7 @@ export class TicketController {
   }
 
   @Post('book')
+  @ApiTags('tickets')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   bookTicket(
@@ -58,6 +62,7 @@ export class TicketController {
   }
 
   @Post('buy')
+  @ApiTags('tickets')
   @UseGuards(AuthGuard)
   @Auth(Roles.Passenger)
   buyTicket(
@@ -68,6 +73,7 @@ export class TicketController {
   }
 
   @Post('create')
+  @ApiTags('tickets')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   createTicket(
@@ -78,6 +84,7 @@ export class TicketController {
   }
 
   @Patch('update/:id')
+  @ApiTags('tickets')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   updateTicket(
