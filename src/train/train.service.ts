@@ -98,6 +98,7 @@ export class TrainService {
     const newTrain = new Train();
 
     newTrain.typeName = createTrainDto.typeName;
+    newTrain.name = createTrainDto.name;
     newTrain.routeId = createTrainDto.routeId;
 
     return await this.trainRepository.save(newTrain);

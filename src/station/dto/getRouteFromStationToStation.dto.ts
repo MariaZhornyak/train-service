@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsISO8601, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class RouteFromStatioToStationDto {
   @ApiProperty()
@@ -11,4 +11,9 @@ export class RouteFromStatioToStationDto {
   @IsNotEmpty()
   @IsUUID('4')
   secondStationId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsISO8601()
+  departureDate: string;
 }

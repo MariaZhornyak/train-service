@@ -195,16 +195,25 @@ export class StationService {
       });
     }
 
+    const dayOfTheWeek =
+      new Date(routeFromStationToStationDto.departureDate).getDay() - 1;
+
     const queryForFirstStation = await this.stationRepository.query(`
-      SELECT route.name, train.id FROM station
+      SELECT route.name AS "routeName",
+        train.id, train.name, train.typeName,
+        train_station.wayFromFirstStation,
+        train_station.wayFromLastStation
+      FROM station
       INNER JOIN route_station ON station.id = route_station."stationId"
       INNER JOIN route ON route_station."routeId" = route.id
       INNER JOIN train ON route.id = train."routeId"
+      INNER JOIN train_station ON train_station.trainId = train.id
+        AND train_station.stationId = station.id
       WHERE station.id = '${routeFromStationToStationDto.firstStationId}'
     `);
 
     const queryForSecondStation = await this.stationRepository.query(`
-      SELECT route.name, train.id FROM station
+      SELECT route.name AS "routeName", train.id, train.name FROM station
       INNER JOIN route_station ON station.id = route_station."stationId"
       INNER JOIN route ON route_station."routeId" = route.id
       INNER JOIN train ON route.id = train."routeId"
@@ -213,17 +222,19 @@ export class StationService {
 
     const queryResult = [];
     for (const item of queryForFirstStation) {
-      if (queryForSecondStation.some((item2) => item2.name == item.name)) {
+      if (
+        queryForSecondStation.some((item2) => item2.routeName == item.routeName)
+      ) {
         queryResult.push(item);
       }
     }
 
-    if (queryResult.length === 0) {
-      throw new BadRequestException({
-        success: false,
-        message: `Such route does not exist`,
-      });
-    }
+    // if (queryResult.length === 0) {
+    //   throw new BadRequestException({
+    //     success: false,
+    //     message: `Such route does not exist`,
+    //   });
+    // }
 
     return queryResult;
   }

@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
 
     const token = headers['authorization'].substr(7);
 
-    const response = await axios.post('http://localhost:3000/user/verify', {
+    const response = await axios.post('http://localhost:5000/user/verify', {
       accessToken: token,
     });
     request['user'] = response.data;

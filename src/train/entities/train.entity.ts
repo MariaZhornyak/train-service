@@ -18,11 +18,14 @@ export class Train {
   @PrimaryColumn({ type: 'uuid' })
   id: string = uuid();
 
+  @Column()
+  name: string;
+
   @ManyToOne(() => TrainType, (trainType) => trainType.trains, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'typeId' })
+  @JoinColumn({ name: 'typeName' })
   type: TrainType;
 
   @Column()
