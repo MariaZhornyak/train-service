@@ -8,5 +8,9 @@ export class CreateTrainDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  name: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
   routeId: string;
 }

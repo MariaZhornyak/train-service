@@ -2,8 +2,8 @@ export enum Day {
   Monday = '1',
   Tuesday = '2',
   Wednesday = '3',
-  Thirsday = '4',
+  Thursday = '4',
   Friday = '5',
-  Sunday = '6',
-  Saturday = '7',
+  Saturday = '6',
+  Sunday = '7',
 }

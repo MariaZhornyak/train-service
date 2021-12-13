@@ -94,8 +94,7 @@ export class StationController {
     return this.stationService.scheduleOfTrainsAtStation(stationId);
   }
 
-  @Get('get/route/between-two-stations')
-  @ApiTags('get all route between two stations')
+  @Get('get/trains/between-two-stations')
   getRouteFromStationToStation(
     @Query() routeFromStationToStationDto: RouteFromStatioToStationDto,
   ) {
