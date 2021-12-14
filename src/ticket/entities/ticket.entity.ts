@@ -45,11 +45,11 @@ export class Ticket {
   @Column({ type: 'timestamptz' })
   departureDateTime: Date;
 
-  @Column()
-  departureStationId: string;
+  // @Column()
+  // departureStationId: string;
 
-  @Column()
-  arrivalStationId: string;
+  // @Column()
+  // arrivalStationId: string;
 
   @Column({
     type: 'enum',

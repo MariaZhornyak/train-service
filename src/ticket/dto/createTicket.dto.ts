@@ -23,11 +23,11 @@ export class CreateTicketDto {
   @IsDateString()
   departureDateTime: Date;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  departureStationId: string;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // departureStationId: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  arrivalStationId: string;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // arrivalStationId: string;
 }
