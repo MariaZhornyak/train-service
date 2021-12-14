@@ -198,44 +198,52 @@ export class StationService {
     const dayOfTheWeek =
       new Date(routeFromStationToStationDto.departureDate).getDay() - 1;
 
-    const queryForFirstStation = await this.stationRepository.query(`
+    const res = await this.stationRepository.query(`
       SELECT route.name AS "routeName",
-        train.id, train.name, train.typeName,
-        train_station.wayFromFirstStation,
-        train_station.wayFromLastStation
+        train.id, train.name, train."typeName",
+        CASE WHEN rs1."stationIndexOnTheRoute" < rs2."stationIndexOnTheRoute"
+          THEN ts1."wayFromFirstStation"
+          ELSE ts1."wayFromLastStation"
+          END
+          "wayFromStart",
+        CASE WHEN rs1."stationIndexOnTheRoute" < rs2."stationIndexOnTheRoute"
+          THEN 'fromStart'
+          ELSE 'fromEnd'
+          END
+          direction,
+        CASE WHEN rs1."stationIndexOnTheRoute" < rs2."stationIndexOnTheRoute"
+          THEN MOD(train_departure.time + ts1."wayFromFirstStation", 86400000)
+          ELSE MOD(train_departure.time + ts1."wayFromLastStation", 86400000)
+          END
+          "departureTime",
+        CASE WHEN rs1."stationIndexOnTheRoute" < rs2."stationIndexOnTheRoute"
+          THEN ts2."wayFromFirstStation" - ts1."wayFromFirstStation"
+          ELSE ts2."wayFromLastStation" - ts1."wayFromLastStation"
+          END
+          "travelTime"
       FROM station
-      INNER JOIN route_station ON station.id = route_station."stationId"
-      INNER JOIN route ON route_station."routeId" = route.id
-      INNER JOIN train ON route.id = train."routeId"
-      INNER JOIN train_station ON train_station.trainId = train.id
-        AND train_station.stationId = station.id
-      WHERE station.id = '${routeFromStationToStationDto.firstStationId}'
+      INNER JOIN route_station rs1 ON rs1."stationId" = station.id
+      INNER JOIN route ON route.id = rs1."routeId"
+      INNER JOIN route_station rs2 ON rs2."routeId" = route.id
+      INNER JOIN train ON train."routeId" = route.id
+      INNER JOIN train_station ts1 ON ts1."trainId" = train.id
+        AND ts1."stationId" = rs1."stationId"
+      INNER JOIN train_station ts2 ON ts2."trainId" = train.id
+        AND ts2."stationId" = rs2."stationId"
+      INNER JOIN train_departure ON train_departure."trainId" = train.id
+      WHERE rs1."stationId" = '${routeFromStationToStationDto.firstStationId}'
+        AND rs2."stationId" = '${routeFromStationToStationDto.secondStationId}'
+        AND ((
+          rs1."stationIndexOnTheRoute" < rs2."stationIndexOnTheRoute"
+          AND train_departure.direction = 'fromStart'
+          AND DIV(train_departure.time + ts1."wayFromFirstStation", 86400000) = ${dayOfTheWeek}
+        ) OR (
+          rs1."stationIndexOnTheRoute" > rs2."stationIndexOnTheRoute"
+          AND train_departure.direction = 'fromEnd'
+          AND DIV(train_departure.time + ts1."wayFromLastStation", 86400000) = ${dayOfTheWeek}
+        ))
     `);
 
-    const queryForSecondStation = await this.stationRepository.query(`
-      SELECT route.name AS "routeName", train.id, train.name FROM station
-      INNER JOIN route_station ON station.id = route_station."stationId"
-      INNER JOIN route ON route_station."routeId" = route.id
-      INNER JOIN train ON route.id = train."routeId"
-      WHERE station.id = '${routeFromStationToStationDto.secondStationId}'
-    `);
-
-    const queryResult = [];
-    for (const item of queryForFirstStation) {
-      if (
-        queryForSecondStation.some((item2) => item2.routeName == item.routeName)
-      ) {
-        queryResult.push(item);
-      }
-    }
-
-    // if (queryResult.length === 0) {
-    //   throw new BadRequestException({
-    //     success: false,
-    //     message: `Such route does not exist`,
-    //   });
-    // }
-
-    return queryResult;
+    return res;
   }
 }

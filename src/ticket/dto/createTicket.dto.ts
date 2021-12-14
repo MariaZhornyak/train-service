@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsDateString, IsNotEmpty } from 'class-validator';
 
 export class CreateTicketDto {
@@ -6,13 +7,13 @@ export class CreateTicketDto {
   // @IsNotEmpty()
   // userId: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  documentType: string;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // documentType: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  documentNumber: string;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // documentNumber: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -23,11 +24,11 @@ export class CreateTicketDto {
   @IsDateString()
   departureDateTime: Date;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  departureStationId: string;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // departureStationId: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  arrivalStationId: string;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // arrivalStationId: string;
 }

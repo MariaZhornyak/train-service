@@ -26,11 +26,11 @@ export class Ticket {
   // @Column()
   // surname: string;
 
-  @Column()
-  documentType: string;
+  // @Column()
+  // documentType: string;
 
-  @Column()
-  documentNumber: string;
+  // @Column()
+  // documentNumber: string;
 
   @ManyToOne(() => Sitting, (sitting) => sitting.tickets, {
     onUpdate: 'CASCADE',
@@ -45,11 +45,11 @@ export class Ticket {
   @Column({ type: 'timestamptz' })
   departureDateTime: Date;
 
-  @Column()
-  departureStationId: string;
+  // @Column()
+  // departureStationId: string;
 
-  @Column()
-  arrivalStationId: string;
+  // @Column()
+  // arrivalStationId: string;
 
   @Column({
     type: 'enum',

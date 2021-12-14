@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ICurrentUser } from '../interface/current-user.interface';
 import { ISuccess } from '../interface/success.interface';
+import { TrainDeparture } from '../train/entities/trainDeparture.entity';
 import { CreateTicketDto } from './dto/createTicket.dto';
 import { UpdateTicketDto } from './dto/updateTicket.dto';
 import { Ticket } from './entities/ticket.entity';
@@ -16,6 +17,8 @@ import { State } from './enums/state.enum';
 export class TicketService {
   constructor(
     @InjectRepository(Ticket) private ticketRepository: Repository<Ticket>,
+    @InjectRepository(TrainDeparture)
+    private trainDepartureRepository: Repository<TrainDeparture>,
   ) {}
 
   async getTicketsList(): Promise<Ticket[]> {
@@ -70,15 +73,41 @@ export class TicketService {
       });
     }
 
+    const {
+      0: { id: trainId },
+    } = await this.ticketRepository.query(`
+      SELECT train.id
+      FROM train
+      INNER JOIN carriage ON carriage."trainId" = train.id
+      INNER JOIN sitting ON sitting."carriageId" = carriage.id
+      WHERE sitting.id = '${createTicketDto.sittingId}'
+    `);
+
+    const departureDate = new Date(createTicketDto.departureDateTime);
+
+    const departure = await this.trainDepartureRepository.find({
+      trainId: trainId,
+      time:
+        (departureDate.valueOf() % (24 * 3600 * 1000)) +
+        (departureDate.getDay() - 1) * (24 * 3600 * 1000),
+    });
+
+    if (!departure.length) {
+      throw new BadRequestException({
+        success: false,
+        message: "Departure doesn't exists.",
+      });
+    }
+
     const newTicket = new Ticket();
 
     newTicket.sittingId = createTicketDto.sittingId;
     newTicket.state = state;
-    newTicket.documentType = createTicketDto.documentType;
-    newTicket.documentNumber = createTicketDto.documentNumber;
+    // newTicket.documentType = createTicketDto.documentType;
+    // newTicket.documentNumber = createTicketDto.documentNumber;
     newTicket.departureDateTime = createTicketDto.departureDateTime;
-    newTicket.departureStationId = createTicketDto.departureStationId;
-    newTicket.arrivalStationId = createTicketDto.arrivalStationId;
+    // newTicket.departureStationId = createTicketDto.departureStationId;
+    // newTicket.arrivalStationId = createTicketDto.arrivalStationId;
     newTicket.userId = user.id;
 
     return await this.ticketRepository.save(newTicket);
