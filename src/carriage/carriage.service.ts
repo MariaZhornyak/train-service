@@ -10,6 +10,7 @@ import { Train } from '../train/entities/train.entity';
 import { CreateCarriageDto } from './dto/createCarriage.dto';
 import { CreateCarriageTypeDto } from './dto/createCarriageType.dto';
 import { FreeSittingsDto } from './dto/freeSittings.dto';
+import { GetCarriagesDto } from './dto/getCarriages.dto';
 import { UpdateCarriageDto } from './dto/updateCarriage.dto';
 import { UpdateCarriageTypeDto } from './dto/updateCarriageType.dto';
 import { CarriageType } from './entities/carriage-type.entity';
@@ -29,8 +30,12 @@ export class CarriageService {
     private trainRepository: Repository<Train>,
   ) {}
 
-  async getCarriagesList(): Promise<Carriage[]> {
-    const carriageList = await this.carriageRepository.find();
+  async getCarriagesList(dto?: GetCarriagesDto): Promise<Carriage[]> {
+    const filter = {} as any;
+    if (dto?.trainId) {
+      filter.trainId = dto.trainId;
+    }
+    const carriageList = await this.carriageRepository.find(filter);
     if (!carriageList || carriageList.length === 0) {
       throw new NotFoundException({
         success: false,

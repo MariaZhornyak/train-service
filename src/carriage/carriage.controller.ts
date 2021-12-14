@@ -22,6 +22,7 @@ import { UpdateCarriageTypeDto } from './dto/updateCarriageType.dto';
 import { CarriageType } from './entities/carriage-type.entity';
 import { Carriage } from './entities/carriage.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { GetCarriagesDto } from './dto/getCarriages.dto';
 
 @Controller('carriages')
 @ApiBearerAuth()
@@ -32,8 +33,8 @@ export class CarriageController {
   @ApiTags('carriages')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
-  getCarriagesList(): Promise<Carriage[]> {
-    return this.carriageService.getCarriagesList();
+  getCarriagesList(@Query() dto: GetCarriagesDto): Promise<Carriage[]> {
+    return this.carriageService.getCarriagesList(dto);
   }
 
   @Get('get/single/:id')

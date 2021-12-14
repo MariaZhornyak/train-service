@@ -26,11 +26,11 @@ export class Ticket {
   // @Column()
   // surname: string;
 
-  @Column()
-  documentType: string;
+  // @Column()
+  // documentType: string;
 
-  @Column()
-  documentNumber: string;
+  // @Column()
+  // documentNumber: string;
 
   @ManyToOne(() => Sitting, (sitting) => sitting.tickets, {
     onUpdate: 'CASCADE',
