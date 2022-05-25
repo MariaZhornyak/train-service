@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CreateTrainDto } from './dto/createTrain.dto';
@@ -32,7 +33,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class TrainController {
   constructor(private readonly trainService: TrainService) {}
 
-  @Get('/get/list')
+  @Get('get/list')
   @ApiTags('trains')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
@@ -48,7 +49,7 @@ export class TrainController {
     return this.trainService.getSingleTrain(id);
   }
 
-  @Post('/create')
+  @Post('create')
   @ApiTags('trains')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
@@ -75,7 +76,7 @@ export class TrainController {
     return this.trainService.deleteTrain(id);
   }
 
-  @Get('/types/get/list')
+  @Get('types/get/list')
   @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
@@ -83,14 +84,14 @@ export class TrainController {
     return this.trainService.getTrainTypesList();
   }
 
-  @Get('/types/get/:name')
+  @Get('types/get/:name')
   @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
   getSingleTrainType(@Param('name') name: string): Promise<TrainType> {
     return this.trainService.getSingleTrainType(name);
   }
-  @Post('/types/create')
+  @Post('types/create')
   @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
@@ -100,7 +101,7 @@ export class TrainController {
     return this.trainService.createTrainType(createTrainTypeDto);
   }
 
-  @Put('/types/update/:name')
+  @Put('types/update/:name')
   @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
@@ -111,7 +112,7 @@ export class TrainController {
     return this.trainService.updateTrainType(name, updateTrainTypeDto);
   }
 
-  @Delete('/types/delete/:name')
+  @Delete('types/delete/:name')
   @ApiTags('train types')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager)
@@ -177,5 +178,17 @@ export class TrainController {
   @Auth(Roles.Manager, Roles.Headmaster, Roles.Passenger)
   getScheduleOfTrainsById(@Param('id') trainId: string) {
     return this.trainService.getScheduleOfTrainsById(trainId);
+  }
+
+  @Get('ways-between-two-stations')
+  @ApiTags('get ways between two stations')
+  getWaysBetweenTwoStations(
+    @Query('fromStationId') fromStationId: string,
+    @Query('toStationId') toStationId: string,
+  ) {
+    return this.trainService.getWaysBetweenTwoStations(
+      fromStationId,
+      toStationId,
+    );
   }
 }

@@ -1,6 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import axios from 'axios';
+
+import { config } from '../config';
 import { Roles } from '../enum/roles.enum';
 
 @Injectable()
@@ -20,9 +22,12 @@ export class AuthGuard implements CanActivate {
 
     const token = headers['authorization'].substr(7);
 
-    const response = await axios.post('http://localhost:3000/user/verify', {
-      accessToken: token,
-    });
+    const response = await axios.post(
+      new URL('/user/verify', config.authURL).toString(),
+      {
+        accessToken: token,
+      },
+    );
     request['user'] = response.data;
 
     const roles = this.reflector.get<Roles[]>('roles', context.getHandler());

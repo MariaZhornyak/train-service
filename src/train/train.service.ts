@@ -17,7 +17,6 @@ import { TrainStation } from '../station/entities/trainStation.entity';
 import { TrainDeparture } from './entities/trainDeparture.entity';
 import { CreateTrainDepartureDto } from './dto/createTrainDeparture.dto';
 import { ISuccess } from '../interface/success.interface';
-import { ICurrentUser } from '../interface/current-user.interface';
 import { Route } from '../route/entities/route.entity';
 import { Station } from '../station/entities/station.entity';
 
@@ -375,12 +374,123 @@ export class TrainService {
     }
 
     const schedule = await this.trainRepository.query(`
-    SELECT train.id, route.name, train_departure.time 
-    FROM train 
-    INNER JOIN train_departure ON train.id = train_departure."trainId"
-    INNER JOIN route ON train."routeId" = route.id
+      SELECT train.id, route.name, train_departure.time 
+      FROM train 
+      INNER JOIN train_departure ON train.id = train_departure."trainId"
+      INNER JOIN route ON train."routeId" = route.id
       WHERE train.id = '${trainId}'
     `);
     return schedule;
+  }
+
+  async getWaysBetweenTwoStations(fromStationId: string, toStationId: string) {
+    const trains = await this.trainRepository.find({
+      relations: ['route', 'trainStations'],
+    });
+
+    const ways: {
+      trains: Train[];
+      stationIds: string[];
+    }[] = [];
+    const func = (
+      train: Train,
+      currentStationId: string,
+      stationsPath: string[],
+      usedTrains: Train[],
+      usedStationsIds: string[],
+    ) => {
+      if (
+        usedTrains.find(
+          (train1) =>
+            train1.route.id === train.route.id && train1.id !== train.id,
+        )
+      ) {
+        return;
+      }
+
+      usedTrains = usedTrains.concat([train]);
+      stationsPath = stationsPath.concat([currentStationId]);
+
+      if (
+        train.trainStations.find(
+          (trainStation) => trainStation.stationId === toStationId,
+        )
+      ) {
+        stationsPath = stationsPath.concat([toStationId]);
+        ways.push({ trains: usedTrains, stationIds: stationsPath });
+        return;
+      } else {
+        const encounteredTrains: Train[] = [].concat(usedTrains);
+        for (const { stationId } of train.trainStations) {
+          if (usedStationsIds.includes(stationId)) {
+            continue;
+          }
+
+          for (const train1 of trains.filter((train2) =>
+            train2.trainStations.find(
+              (trainStation) => trainStation.stationId === stationId,
+            ),
+          )) {
+            if (encounteredTrains.find((train2) => train2.id === train1.id)) {
+              continue;
+            }
+
+            encounteredTrains.push(train1);
+
+            func(
+              train1,
+              stationId,
+              stationsPath,
+              usedTrains,
+              usedStationsIds.concat(
+                train.trainStations.map(
+                  (trainStation) => trainStation.stationId,
+                ),
+              ),
+            );
+          }
+        }
+      }
+    };
+
+    for (const train of trains.filter((train) =>
+      train.trainStations.find(
+        (trainStation) => trainStation.stationId === fromStationId,
+      ),
+    )) {
+      func(train, fromStationId, [], [], [fromStationId]);
+    }
+
+    const result: { trains: Train[]; length: number }[] = [];
+    for (const way of ways) {
+      let length = 0;
+      let currentStationId = fromStationId;
+      for (let i = 0; i < way.trains.length; i++) {
+        let isFrom: boolean;
+        let isCounting = false;
+        for (const trainStation of way.trains[i].trainStations) {
+          if (isCounting) {
+            length += isFrom
+              ? trainStation.wayFromFirstStation +
+                trainStation.trainStandFromFirstStation
+              : trainStation.wayFromLastStation +
+                trainStation.trainStandFromLastStation;
+          }
+
+          if (trainStation.stationId === currentStationId) {
+            isFrom = true;
+            isCounting = !isCounting;
+          }
+          if (trainStation.stationId === way.stationIds[i + 1]) {
+            isFrom = false;
+            isCounting = !isCounting;
+          }
+        }
+      }
+
+      result.push({ trains: way.trains, length });
+    }
+
+    return result;
   }
 }
