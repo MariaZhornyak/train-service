@@ -461,7 +461,12 @@ export class TrainService {
       func(train, fromStationId, [], [], [fromStationId]);
     }
 
-    const result: { trains: Train[]; length: number }[] = [];
+    const stations = await this.stationRepository.find();
+    const result: {
+      trains: Train[];
+      stations: Station[];
+      length: number;
+    }[] = [];
     for (const way of ways) {
       let length = 0;
       let currentStationId = fromStationId;
@@ -488,7 +493,13 @@ export class TrainService {
         }
       }
 
-      result.push({ trains: way.trains, length });
+      result.push({
+        trains: way.trains,
+        stations: way.stationIds.map((stationId) =>
+          stations.find((station) => station.id === stationId),
+        ),
+        length,
+      });
     }
 
     return result;
