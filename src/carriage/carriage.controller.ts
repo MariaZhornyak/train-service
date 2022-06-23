@@ -32,7 +32,7 @@ export class CarriageController {
   @Get('get/list')
   @ApiTags('carriages')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   getCarriagesList(@Query() dto: GetCarriagesDto): Promise<Carriage[]> {
     return this.carriageService.getCarriagesList(dto);
   }
@@ -40,7 +40,7 @@ export class CarriageController {
   @Get('get/single/:id')
   @ApiTags('carriages')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   getSingleCarriage(@Param('id') id: string): Promise<Carriage> {
     return this.carriageService.getSingleCarriage(id);
   }
@@ -122,7 +122,7 @@ export class CarriageController {
   @Get('get/sittings')
   @ApiTags('free sittings in carriage')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Headmaster, Roles.Passenger)
+  @Auth(Roles.Manager, Roles.Passenger)
   getFreeSittingsInCarriage(@Query() freeSittingsDto: FreeSittingsDto) {
     return this.carriageService.getFreeSittingsInCarriage(freeSittingsDto);
   }

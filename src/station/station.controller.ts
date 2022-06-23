@@ -30,7 +30,7 @@ export class StationController {
   @Get('get/list')
   @ApiTags('stations')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   getStationsList(): Promise<Station[]> {
     return this.stationService.getStationsList();
   }
@@ -38,7 +38,7 @@ export class StationController {
   @Get('get/:id')
   @ApiTags('stations')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   getSingleStation(@Param('id') id: string): Promise<Station> {
     return this.stationService.getSingleStation(id);
   }
@@ -73,7 +73,7 @@ export class StationController {
   @Get(':id/routes')
   @ApiTags('get all routes which goes through station')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   getRoutesOfStation(@Param('id') stationId: string): Promise<Route[]> {
     return this.stationService.getRoutesOfStation(stationId);
   }
@@ -81,7 +81,7 @@ export class StationController {
   @Get(':id/trains')
   @ApiTags('get all trains which goes through station')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   getTrainsOfStation(@Param('id') trainId: string): Promise<Train[]> {
     return this.stationService.getTrainsOfStation(trainId);
   }
@@ -89,7 +89,7 @@ export class StationController {
   @Get('schedule/:id/trains')
   @ApiTags('get schedule of trains those go through station')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   scheduleOfTrainsAtStations(@Param('id') stationId: string) {
     return this.stationService.scheduleOfTrainsAtStation(stationId);
   }

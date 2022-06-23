@@ -103,11 +103,7 @@ export class TicketService {
 
     newTicket.sittingId = createTicketDto.sittingId;
     newTicket.state = state;
-    // newTicket.documentType = createTicketDto.documentType;
-    // newTicket.documentNumber = createTicketDto.documentNumber;
     newTicket.departureDateTime = createTicketDto.departureDateTime;
-    // newTicket.departureStationId = createTicketDto.departureStationId;
-    // newTicket.arrivalStationId = createTicketDto.arrivalStationId;
     newTicket.userId = user.id;
 
     return await this.ticketRepository.save(newTicket);

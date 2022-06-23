@@ -36,7 +36,7 @@ export class TrainController {
   @Get('get/list')
   @ApiTags('trains')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   getTrainsList(): Promise<Train[]> {
     return this.trainService.getTrainsList();
   }
@@ -44,7 +44,7 @@ export class TrainController {
   @Get('get/:id')
   @ApiTags('trains')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Passenger, Roles.Headmaster)
+  @Auth(Roles.Manager, Roles.Passenger)
   getSingleTrain(@Param('id') id: string): Promise<Train> {
     return this.trainService.getSingleTrain(id);
   }
@@ -175,7 +175,7 @@ export class TrainController {
   @Get('get/schedule/:id')
   @ApiTags('get train`s schedule')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager, Roles.Headmaster, Roles.Passenger)
+  @Auth(Roles.Manager, Roles.Passenger)
   getScheduleOfTrainsById(@Param('id') trainId: string) {
     return this.trainService.getScheduleOfTrainsById(trainId);
   }
