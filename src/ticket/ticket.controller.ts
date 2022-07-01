@@ -29,9 +29,14 @@ export class TicketController {
   @Get('get/list')
   @ApiTags('tickets')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager)
-  getTicketsList(): Promise<Ticket[]> {
-    return this.ticketService.getTicketsList();
+  @Auth(Roles.Manager, Roles.Passenger)
+  getTicketsList(@CurrentUser() user: ICurrentUser): Promise<Ticket[]> {
+    let ticketUserId: string;
+    if (user.role !== Roles.Manager) {
+      ticketUserId = user.id;
+    }
+
+    return this.ticketService.getTicketsList(ticketUserId);
   }
 
   @Get('get/:id')
@@ -40,14 +45,6 @@ export class TicketController {
   @Auth(Roles.Manager)
   getSingleTicket(@Param('id') id: string): Promise<Ticket> {
     return this.ticketService.getSingleTicket(id);
-  }
-
-  @Delete('delete/:id')
-  @ApiTags('tickets')
-  @UseGuards(AuthGuard)
-  @Auth(Roles.Manager)
-  deleteTicket(@Param('id') id: string): Promise<Ticket> {
-    return this.ticketService.deleteTicket(id);
   }
 
   @Post('book')
@@ -92,5 +89,21 @@ export class TicketController {
     @Body() updateTicketDto: UpdateTicketDto,
   ): Promise<ISuccess> {
     return this.ticketService.updateTicket(id, updateTicketDto);
+  }
+
+  @Delete('return/:id')
+  @ApiTags('tickets')
+  @UseGuards(AuthGuard)
+  @Auth(Roles.Manager, Roles.Passenger)
+  returnTicket(
+    @Param('id') id: string,
+    @CurrentUser() user: ICurrentUser,
+  ): Promise<ISuccess> {
+    let ticketUserId: string;
+    if (user.role !== Roles.Manager) {
+      ticketUserId = user.id;
+    }
+
+    return this.ticketService.returnTicket(id, ticketUserId);
   }
 }

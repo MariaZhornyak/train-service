@@ -363,7 +363,14 @@ export class TrainService {
     return await this.trainDepartureRepository.save(newTrainDeparture);
   }
 
-  async getScheduleOfTrainsById(trainId: string) {
+  async deleteTrainDeparture(id: string): Promise<ISuccess> {
+    const result = await this.trainDepartureRepository.delete(id);
+    return {
+      success: result.affected === 1,
+    };
+  }
+
+  async getScheduleOfTrainById(trainId: string) {
     const train = await this.trainRepository.findOne(trainId);
 
     if (!train) {
@@ -373,14 +380,7 @@ export class TrainService {
       });
     }
 
-    const schedule = await this.trainRepository.query(`
-      SELECT train.id, route.name, train_departure.time 
-      FROM train 
-      INNER JOIN train_departure ON train.id = train_departure."trainId"
-      INNER JOIN route ON train."routeId" = route.id
-      WHERE train.id = '${trainId}'
-    `);
-    return schedule;
+    return await this.trainDepartureRepository.find({ trainId });
   }
 
   async getWaysBetweenTwoStations(fromStationId: string, toStationId: string) {

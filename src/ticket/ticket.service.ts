@@ -21,15 +21,24 @@ export class TicketService {
     private trainDepartureRepository: Repository<TrainDeparture>,
   ) {}
 
-  async getTicketsList(): Promise<Ticket[]> {
-    const tickets = await this.ticketRepository.find();
-    if (!tickets || tickets.length === 0) {
-      throw new NotFoundException({
-        success: false,
-        message: 'Tickets list is empty',
-      });
+  async getTicketsList(userId?: string): Promise<Ticket[]> {
+    const filter = {};
+    if (userId) filter['userId'] = userId;
+
+    let query = `
+      select ticket.*, route.name as "routeName"
+      from ticket
+      inner join sitting on sitting.id = ticket."sittingId"
+      inner join carriage on carriage.id = sitting."carriageId"
+      inner join train on train.id = carriage."trainId"
+      inner join route on route.id = train."routeId"
+    `;
+
+    if (userId) {
+      query += `where ticket."userId" = '${userId}'`;
     }
-    return tickets;
+
+    return await this.ticketRepository.query(query);
   }
 
   async getSingleTicket(id: string): Promise<Ticket> {
@@ -131,6 +140,20 @@ export class TicketService {
     }
 
     await this.ticketRepository.update({ id }, newObj);
+    return { success: true };
+  }
+
+  async returnTicket(id: string, userId?: string): Promise<ISuccess> {
+    const ticket = await this.ticketRepository.findOne(id);
+
+    if (!ticket || (userId && ticket.userId != userId)) {
+      throw new NotFoundException({
+        success: false,
+        message: `Ticket #${id} not found`,
+      });
+    }
+
+    await this.ticketRepository.delete({ id });
     return { success: true };
   }
 }

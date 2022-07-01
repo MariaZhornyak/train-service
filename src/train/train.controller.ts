@@ -172,12 +172,20 @@ export class TrainController {
     return this.trainService.createTrainDeparture(createTrainDepartureDto);
   }
 
+  @Post('departure-date/delete/:id')
+  @ApiTags('departure date')
+  @UseGuards(AuthGuard)
+  @Auth(Roles.Manager)
+  deleteTrainDeparture(@Param('id') id: string): Promise<ISuccess> {
+    return this.trainService.deleteTrainDeparture(id);
+  }
+
   @Get('get/schedule/:id')
   @ApiTags('get train`s schedule')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger)
   getScheduleOfTrainsById(@Param('id') trainId: string) {
-    return this.trainService.getScheduleOfTrainsById(trainId);
+    return this.trainService.getScheduleOfTrainById(trainId);
   }
 
   @Get('ways-between-two-stations')

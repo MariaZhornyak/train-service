@@ -198,7 +198,7 @@ export class StationService {
     const dayOfTheWeek =
       new Date(routeFromStationToStationDto.departureDate).getDay() - 1;
 
-    const res = await this.stationRepository.query(`
+    const query = `
       SELECT route.name AS "routeName",
         train.id, train.name, train."typeName",
         CASE WHEN rs1."stationIndexOnTheRoute" < rs2."stationIndexOnTheRoute"
@@ -242,7 +242,11 @@ export class StationService {
           AND train_departure.direction = 'fromEnd'
           AND DIV(train_departure.time + ts1."wayFromLastStation", 86400000) = ${dayOfTheWeek}
         ))
-    `);
+    `;
+
+    console.log(query);
+
+    const res = await this.stationRepository.query(query);
 
     return res;
   }

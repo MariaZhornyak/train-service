@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { stringify } from 'querystring';
 import { Repository } from 'typeorm';
 import { ISuccess } from '../interface/success.interface';
 import { Station } from '../station/entities/station.entity';
@@ -216,20 +215,19 @@ export class RouteService {
     id: string,
     updateRouteStationDto: UpdateRouteStationDto,
   ): Promise<ISuccess> {
-    const routeStation = await this.routeStationRepository.findOne({
-      routeId: updateRouteStationDto.routeId,
-      stationId: updateRouteStationDto.stationId,
-    });
+    // const routeStation = await this.routeStationRepository.findOne({
+    //   routeId: updateRouteStationDto.routeId,
+    //   stationId: updateRouteStationDto.stationId,
+    // });
 
-    if (!routeStation) {
-      throw new NotFoundException({
-        success: false,
-        message: `Such station is already in the route`,
-      });
-    }
+    // if (!routeStation) {
+    //   throw new NotFoundException({
+    //     success: false,
+    //     message: `Such station is already in the route`,
+    //   });
+    // }
 
     const newObj = {};
-
     for (const key in updateRouteStationDto) {
       if (updateRouteStationDto[key] != undefined) {
         newObj[key] = updateRouteStationDto[key];
@@ -238,6 +236,13 @@ export class RouteService {
 
     await this.routeStationRepository.update({ id }, newObj);
     return { success: true };
+  }
+
+  async deleteRouteStation(id: string): Promise<ISuccess> {
+    const result = await this.routeStationRepository.delete(id);
+    return {
+      success: result.affected === 1,
+    };
   }
 
   async getStationsOfRoute(routeId: string): Promise<Station[]> {
@@ -260,6 +265,22 @@ export class RouteService {
     });
 
     return routeStations.map((rs) => rs.station);
+  }
+
+  async getRouteStation(
+    routeId: string,
+    stationId: string,
+  ): Promise<RouteStation> {
+    const routeStation = await this.routeStationRepository.findOne({
+      routeId,
+      stationId,
+    });
+
+    if (!routeStation) {
+      throw new BadRequestException('Station is not on the route');
+    }
+
+    return routeStation;
   }
 
   async getTrainsOfRoute(routeId: string): Promise<Train[]> {

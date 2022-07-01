@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../guard/auth.guard';
@@ -22,6 +23,7 @@ import { Route } from './entities/route.entity';
 import { RouteStation } from './entities/routeStation.entity';
 import { RouteService } from './route.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { GetRouteStationDto } from './dto/getRouteStation.dto';
 
 @Controller('routes')
 @ApiBearerAuth()
@@ -113,12 +115,28 @@ export class RouteController {
     return this.routeService.updateRouteStation(id, updateRouteStationDto);
   }
 
+  @Delete('stations/delete/:id')
+  @ApiTags('Delete routeStation')
+  @UseGuards(AuthGuard)
+  @Auth(Roles.Manager)
+  deleteRouteStation(@Param('id') id: string): Promise<ISuccess> {
+    return this.routeService.deleteRouteStation(id);
+  }
+
   @Get('route/:id/stations')
   @ApiTags('get list of stations at route')
   @UseGuards(AuthGuard)
   @Auth(Roles.Manager, Roles.Passenger)
   getStationsOfRoute(@Param('id') routeId: string): Promise<Station[]> {
     return this.routeService.getStationsOfRoute(routeId);
+  }
+
+  @Get('route-stations/get')
+  @ApiTags('get routeStation')
+  @UseGuards(AuthGuard)
+  @Auth(Roles.Manager, Roles.Passenger)
+  getRouteStation(@Query() dto: GetRouteStationDto): Promise<RouteStation> {
+    return this.routeService.getRouteStation(dto.routeId, dto.stationId);
   }
 
   @Get('route/:id/trains')
