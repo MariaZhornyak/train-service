@@ -50,7 +50,7 @@ export class TicketController {
   @Post('book')
   @ApiTags('tickets')
   @UseGuards(AuthGuard)
-  @Auth(Roles.Manager)
+  @Auth(Roles.Passenger)
   bookTicket(
     @Body() createTicketDto: CreateTicketDto,
     @CurrentUser() user: ICurrentUser,

@@ -244,8 +244,6 @@ export class StationService {
         ))
     `;
 
-    console.log(query);
-
     const res = await this.stationRepository.query(query);
 
     return res;
