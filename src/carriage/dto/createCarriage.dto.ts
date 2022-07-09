@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
+import { IsDecimal, IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
 export class CreateCarriageDto {
   @ApiProperty()
@@ -18,7 +18,7 @@ export class CreateCarriageDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   priceOfSitting: number;
 
   @ApiProperty()
