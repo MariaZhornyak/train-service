@@ -37,10 +37,7 @@ export class CarriageService {
     }
     const carriageList = await this.carriageRepository.find(filter);
     if (!carriageList || carriageList.length === 0) {
-      throw new NotFoundException({
-        success: false,
-        message: 'Carriage list is empty',
-      });
+      return [];
     }
     return carriageList;
   }

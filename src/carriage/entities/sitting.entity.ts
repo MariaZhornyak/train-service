@@ -19,7 +19,7 @@ export class Sitting {
   @Column()
   indexInCarriage: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 2 })
   price: number;
 
   @ManyToOne(() => Carriage, (carriage) => carriage.id, {

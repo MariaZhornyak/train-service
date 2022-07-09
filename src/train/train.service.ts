@@ -113,26 +113,30 @@ export class TrainService {
       });
     }
 
-    const trainType = await this.trainTypeRepository.findOne({
-      name: updateTrainDto.typeName,
-    });
-
-    if (!trainType) {
-      throw new BadRequestException({
-        success: false,
-        message: 'Such train type does not exist',
+    if (updateTrainDto.typeName) {
+      const trainType = await this.trainTypeRepository.findOne({
+        name: updateTrainDto.typeName,
       });
+
+      if (!trainType) {
+        throw new BadRequestException({
+          success: false,
+          message: 'Such train type does not exist',
+        });
+      }
     }
 
-    const route = await this.routeRepository.findOne({
-      id: updateTrainDto.routeId,
-    });
-
-    if (!route) {
-      throw new BadRequestException({
-        success: false,
-        message: 'Such route does not exist',
+    if (updateTrainDto.routeId) {
+      const route = await this.routeRepository.findOne({
+        id: updateTrainDto.routeId,
       });
+
+      if (!route) {
+        throw new BadRequestException({
+          success: false,
+          message: 'Such route does not exist',
+        });
+      }
     }
 
     const newObj = {};
@@ -144,6 +148,7 @@ export class TrainService {
     }
 
     await this.trainRepository.update({ id }, newObj);
+
     return { success: true };
   }
 
